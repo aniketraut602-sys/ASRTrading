@@ -1,0 +1,80 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }} # Service Account Key JSON
+  TF_VERSION: 1.5.0
+
+jobs:
+  provision-and-deploy:
+    name: Provision & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false # Create a wrapper that exports output to GITHUB_OUTPUT
+
+      - name: Terraform Init
+        working-directory: ./infra
+        run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Terraform Validate
+        working-directory: ./infra
+        run: terraform validate
+
+      - name: Terraform Apply
+        working-directory: ./infra
+        run: |
+          echo "Applying Terraform..."
+          terraform apply -auto-approve -var="project_id=${{ env.PROJECT_ID }}"
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Get Instance IP
+        id: get-ip
+        working-directory: ./infra
+        run: |
+          IP=$(terraform output -raw public_ip)
+          echo "INSTANCE_IP=$IP" >> $GITHUB_ENV
+          echo "::add-mask::$IP" # Mask IP in logs for slight security
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          # We'll use gcloud to handle SSH keys or use a raw private key if provided.
+          # For simplicity with the previously designed deploy_gcp.sh, we need gcloud.
+          
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Run Deployment Script
+        run: |
+          chmod +x ./pipelines/deploy_gcp.sh
+          # We need to install the setup script dependencies if we run it locally, 
+          # but here we are triggering it remotely via SSH in the script.
+          # deploy_gcp.sh uses `gcloud compute ssh`.
+          ./pipelines/deploy_gcp.sh

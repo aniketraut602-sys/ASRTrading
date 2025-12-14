@@ -1,0 +1,14 @@
+[Unit]
+Description=ASR Trading Engine
+After=network.target
+
+[Service]
+User=Lenovo
+WorkingDirectory=/opt/asr_trading
+ExecStart=/opt/asr_trading/venv/bin/python /opt/asr_trading/run_paper.py
+Restart=always
+RestartSec=10
+EnvironmentFile=/opt/asr_trading/.env
+
+[Install]
+WantedBy=multi-user.target

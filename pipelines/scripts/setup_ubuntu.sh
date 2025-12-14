@@ -10,53 +10,99 @@ echo "Operating System: $(lsb_release -d | cut -f2)"
 
 # 1. Update System
 echo "[1/5] Updating System Packages..."
-sudo apt-get update && sudo apt-get upgrade -y
-sudo apt-get install -y python3-pip python3-venv git htop
+# Prevent interactive prompts
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update
+sudo apt-get install -y docker.io git python3-pip python3-venv htop jq curl
 
 # 2. Setup Project Directory
 echo "[2/5] Setting up Directory..."
 INSTALL_DIR="/opt/asr_trading"
 
-# If current directory looks like the project, copy it. Else clone/empty.
-# Assumption: User uploads zip content to ~ and runs script
-if [ -d "$HOME/ASR_Trading" ]; then
-    echo "Found uploaded files. Copying to $INSTALL_DIR..."
+# Create dir if not exists
+if [ ! -d "$INSTALL_DIR" ]; then
+    echo "Creating install directory..."
     sudo mkdir -p $INSTALL_DIR
-    sudo cp -r $HOME/ASR_Trading/* $INSTALL_DIR/
-else
-    echo "No source files found. Creating empty dir at $INSTALL_DIR"
-    sudo mkdir -p $INSTALL_DIR
-    # We assume SCP will happen later or files are already there
+    sudo chown $USER:$USER $INSTALL_DIR
 fi
 
-# Fix permissions
+# Permissions fix (ensure user owns it)
 sudo chown -R $USER:$USER $INSTALL_DIR
+
+# 3. Code Sync (Git or Copy)
+# If it's a git repo, pull. If not, we assume files are uploaded via SCP/rsync.
+if [ -d "$INSTALL_DIR/.git" ]; then
+    echo "Git repository detected. Pulling latest changes..."
+    cd $INSTALL_DIR
+    git pull
+else
+    echo "No Git repository found at $INSTALL_DIR. Assuming files are transferred manually."
+fi
+
 cd $INSTALL_DIR
 
-# 3. Virtual Environment
-echo "[3/5] Creating Virtual Environment..."
-python3 -m venv venv
+# 4. Virtual Environment (Idempotent)
+echo "[3/5] Checking Virtual Environment..."
+if [ ! -d "venv" ]; then
+    echo "Creating venv..."
+    python3 -m venv venv
+fi
+
 source venv/bin/activate
 pip install --upgrade pip
 if [ -f "requirements.txt" ]; then
+    echo "Installing requirements..."
     pip install -r requirements.txt
 else
     echo "WARNING: requirements.txt not found!"
 fi
 
-# 4. Create .env from example if missing
+# 5. Secrets Management (GCP Secret Manager Integration)
+echo "[4/5] Checking Configuration..."
 if [ ! -f ".env" ]; then
-    echo "[4/5] Creating .env config..."
-    cp .env.example .env
-    echo "PLEASE EDIT .env WITH YOUR KEYS!"
+    echo ".env not found. Attempting to fetch from GCP Secret Manager..."
+    
+    # Check if gcloud is available and configured
+    if command -v gcloud &> /dev/null; then
+        echo "Fetching secrets..."
+        # Try to fetch secrets. Fail gracefully if not configured or permission denied.
+        set +e
+        TG_TOKEN=$(gcloud secrets versions access latest --secret="asr_telegram_token" --quiet 2>/dev/null)
+        GROWW_KEY=$(gcloud secrets versions access latest --secret="asr_groww_api_key" --quiet 2>/dev/null)
+        GROWW_SECRET=$(gcloud secrets versions access latest --secret="asr_groww_api_secret" --quiet 2>/dev/null)
+        set -e
+        
+        if [ -n "$TG_TOKEN" ] && [ -n "$GROWW_KEY" ]; then
+             cat > .env <<EOF
+TELEGRAM_BOT_TOKEN=$TG_TOKEN
+GROWW_API_KEY=$GROWW_KEY
+GROWW_API_SECRET=$GROWW_SECRET
+BROKER_MODE=PAPER
+PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
+EOF
+             echo "Secrets fetched and .env created successfully."
+        else
+             echo "Could not fetch secrets. Creating from example."
+             cp .env.example .env
+             echo "WARNING: Please edit .env manually!"
+        fi
+    else
+        echo "gcloud not found. creating default .env"
+        cp .env.example .env
+    fi
+else
+    echo ".env exists. Skipping generation."
 fi
 
-# 5. Setup Systemd Service (Auto-Start)
-echo "[5/5] Creating 24/7 Background Service..."
+# 6. Service Management (Idempotent)
+echo "[5/5] Configuring background service..."
 
 SERVICE_FILE="/etc/systemd/system/asr_trading.service"
+NEEDS_RELOAD=false
 
-sudo bash -c "cat > $SERVICE_FILE" <<EOF
+# Check if service file content differs or doesn't exist
+# We construct the content to compare/write
+read -r -d '' SERVICE_CONTENT <<EOF
 [Unit]
 Description=ASR Trading Engine
 After=network.target
@@ -67,16 +113,29 @@ WorkingDirectory=$INSTALL_DIR
 ExecStart=$INSTALL_DIR/venv/bin/python $INSTALL_DIR/run_paper.py
 Restart=always
 RestartSec=10
+EnvironmentFile=$INSTALL_DIR/.env
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-sudo systemctl daemon-reload
-sudo systemctl enable asr_trading
+if [ ! -f "$SERVICE_FILE" ]; then
+    echo "Creating service file..."
+    echo "$SERVICE_CONTENT" | sudo tee $SERVICE_FILE > /dev/null
+    NEEDS_RELOAD=true
+else
+    # Simple check if content changed (not perfect but sufficient)
+    # Actually, let's just overwrite to be sure. It's cheap.
+    echo "$SERVICE_CONTENT" | sudo tee $SERVICE_FILE > /dev/null
+    NEEDS_RELOAD=true
+fi
+
+if [ "$NEEDS_RELOAD" = true ]; then
+    sudo systemctl daemon-reload
+    sudo systemctl enable asr_trading
+fi
 
 echo "=== Setup Complete! ==="
-echo "To START the engine: sudo systemctl start asr_trading"
-echo "To STOP the engine:  sudo systemctl stop asr_trading"
-echo "To VIEW LOGS:        journalctl -u asr_trading -f"
-echo "To EDIT CONFIG:      nano $INSTALL_DIR/.env"
+echo "Service is NOT auto-started yet to allow config verification."
+echo "To START: sudo systemctl start asr_trading"
+echo "To CHECK: systemctl status asr_trading"
