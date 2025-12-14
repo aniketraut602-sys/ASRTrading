@@ -1,0 +1,64 @@
+{"ts": 1765538164.6490567, "name": "test_metric", "value": 42.0, "tags": {"env": "test"}}
+{"ts": 1765538853.4761112, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "AAPL"}}
+{"ts": 1765538853.4770646, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "AAPL"}}
+{"ts": 1765538853.4786422, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "AAPL"}}
+{"ts": 1765538853.4797792, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "AAPL"}}
+{"ts": 1765538853.4809124, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "TERTIARY", "symbol": "AAPL"}}
+{"ts": 1765538853.4999783, "name": "event.feed_outage_cache_serve", "value": 1.0, "tags": {"symbol": "AAPL"}}
+{"ts": 1765539425.3143532, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765539425.3155775, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765539460.3912954, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765539460.391787, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765541112.1509132, "name": "data.disagreement_pct", "value": 9.615384615384617, "tags": {"symbol": "TEST"}}
+{"ts": 1765541112.152618, "name": "event.data_integrity_warning", "value": 1.0, "tags": {"symbol": "TEST", "disagreement": 9.615384615384617, "prices": [99, 104, 109]}}
+{"ts": 1765541112.1534414, "name": "event.data_disagreement_reject", "value": 1.0, "tags": {"symbol": "TEST", "pct": 9.615384615384617}}
+{"ts": 1765541148.7538443, "name": "data.disagreement_pct", "value": 9.615384615384617, "tags": {"symbol": "TEST"}}
+{"ts": 1765541148.754595, "name": "event.data_integrity_warning", "value": 1.0, "tags": {"symbol": "TEST", "disagreement": 9.615384615384617, "prices": [99, 104, 109]}}
+{"ts": 1765541148.7551525, "name": "event.data_disagreement_reject", "value": 1.0, "tags": {"symbol": "TEST", "pct": 9.615384615384617}}
+{"ts": 1765545962.0276442, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765545962.0286307, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765546014.5193133, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765546014.520019, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765546014.5287232, "name": "event.feed_corruption_rejected", "value": 1.0, "tags": {"provider": "P_BAD", "symbol": "BAD_SYM"}}
+{"ts": 1765546014.5295446, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "BAD_SYM"}}
+{"ts": 1765551508.544695, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765551508.547178, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765551508.5526075, "name": "event.feed_corruption_rejected", "value": 1.0, "tags": {"provider": "P_BAD", "symbol": "BAD_SYM"}}
+{"ts": 1765551508.5531137, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "BAD_SYM"}}
+{"ts": 1765551508.5562358, "name": "data.disagreement_pct", "value": 9.615384615384617, "tags": {"symbol": "TEST"}}
+{"ts": 1765551508.5569448, "name": "event.data_integrity_warning", "value": 1.0, "tags": {"symbol": "TEST", "disagreement": 9.615384615384617, "prices": [99, 104, 109]}}
+{"ts": 1765551508.5574522, "name": "event.data_disagreement_reject", "value": 1.0, "tags": {"symbol": "TEST", "pct": 9.615384615384617}}
+{"ts": 1765551576.102141, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765551576.1029506, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765551576.1242547, "name": "event.feed_corruption_rejected", "value": 1.0, "tags": {"provider": "P_BAD", "symbol": "BAD_SYM"}}
+{"ts": 1765551576.1248562, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "BAD_SYM"}}
+{"ts": 1765551576.1318154, "name": "data.disagreement_pct", "value": 9.615384615384617, "tags": {"symbol": "TEST"}}
+{"ts": 1765551576.13268, "name": "event.data_integrity_warning", "value": 1.0, "tags": {"symbol": "TEST", "disagreement": 9.615384615384617, "prices": [99, 104, 109]}}
+{"ts": 1765551576.133406, "name": "event.data_disagreement_reject", "value": 1.0, "tags": {"symbol": "TEST", "pct": 9.615384615384617}}
+{"ts": 1765551629.0533345, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765551629.0539606, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765551629.0733013, "name": "event.feed_corruption_rejected", "value": 1.0, "tags": {"provider": "P_BAD", "symbol": "BAD_SYM"}}
+{"ts": 1765551629.074408, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "BAD_SYM"}}
+{"ts": 1765551629.0793843, "name": "data.disagreement_pct", "value": 9.615384615384617, "tags": {"symbol": "TEST"}}
+{"ts": 1765551629.0801315, "name": "event.data_integrity_warning", "value": 1.0, "tags": {"symbol": "TEST", "disagreement": 9.615384615384617, "prices": [99, 104, 109]}}
+{"ts": 1765551629.0810316, "name": "event.data_disagreement_reject", "value": 1.0, "tags": {"symbol": "TEST", "pct": 9.615384615384617}}
+{"ts": 1765551629.3805516, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "AAPL"}}
+{"ts": 1765551629.3812876, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "AAPL"}}
+{"ts": 1765551629.3835015, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "AAPL"}}
+{"ts": 1765551629.3841329, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "AAPL"}}
+{"ts": 1765551629.3854206, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "TERTIARY", "symbol": "AAPL"}}
+{"ts": 1765551629.3859484, "name": "event.feed_outage_cache_serve", "value": 1.0, "tags": {"symbol": "AAPL"}}
+{"ts": 1765638495.1435986, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765638495.144579, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "CHAOS_SYM"}}
+{"ts": 1765638495.1511161, "name": "event.feed_corruption_rejected", "value": 1.0, "tags": {"provider": "P_BAD", "symbol": "BAD_SYM"}}
+{"ts": 1765638495.151623, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "BAD_SYM"}}
+{"ts": 1765638495.156433, "name": "data.disagreement_pct", "value": 9.615384615384617, "tags": {"symbol": "TEST"}}
+{"ts": 1765638495.1572971, "name": "event.data_integrity_warning", "value": 1.0, "tags": {"symbol": "TEST", "disagreement": 9.615384615384617, "prices": [99, 104, 109]}}
+{"ts": 1765638495.1579149, "name": "event.data_disagreement_reject", "value": 1.0, "tags": {"symbol": "TEST", "pct": 9.615384615384617}}
+{"ts": 1765638495.5630643, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "AAPL"}}
+{"ts": 1765638495.563626, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "AAPL"}}
+{"ts": 1765638495.564412, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "PRIMARY", "symbol": "AAPL"}}
+{"ts": 1765638495.5647657, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "SECONDARY", "symbol": "AAPL"}}
+{"ts": 1765638495.5651178, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "TERTIARY", "symbol": "AAPL"}}
+{"ts": 1765638495.5655406, "name": "event.feed_outage_cache_serve", "value": 1.0, "tags": {"symbol": "AAPL"}}
+{"ts": 1765700029.1542604, "name": "event.risk_halt_daily_loss", "value": 1.0, "tags": {"loss": 500.0}}

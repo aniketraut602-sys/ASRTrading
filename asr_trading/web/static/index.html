@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ASR Moonshot Command Center</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* High Contrast & Accessibility Base */
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        :focus {
+            outline: 3px solid #facc15;
+            /* Yellow focus ring for keyboard nav */
+            outline-offset: 2px;
+        }
+
+        header {
+            border-bottom: 2px solid #475569;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #475569;
+            padding-bottom: 10px;
+            font-size: 1.25rem;
+        }
+
+        /* Utility Classes for Status */
+        .status-ok {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .status-warn {
+            color: #facc15;
+            font-weight: bold;
+        }
+
+        .status-err {
+            color: #f87171;
+            font-weight: bold;
+        }
+
+        /* Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header role="banner">
+        <h1>ASR Trading <span style="font-size:0.6em; color:#94a3b8" aria-label="Moonshot Edition">MOONSHOT</span></h1>
+        <p>System Time: <span id="clock" aria-live="off">--:--:--</span></p>
+    </header>
+
+    <main id="main-content" role="main">
+        <div class="grid">
+            <section class="card" aria-labelledby="status-heading">
+                <h2 id="status-heading">System Status</h2>
+                <div role="status" aria-live="polite">
+                    <p>Core Engine: <span class="status-ok">ONLINE</span></p>
+                    <p>Mode: <span id="mode">INITIALIZING...</span></p>
+                    <p>Reliability Score: <span id="reliability">--</span>%</p>
+                </div>
+            </section>
+
+            <section class="card" aria-labelledby="signals-heading">
+                <h2 id="signals-heading">Active Command Signals</h2>
+                <ul id="signals-list" aria-live="polite">
+                    <li>Scanning market data...</li>
+                </ul>
+            </section>
+
+            <section class="card" aria-labelledby="ai-heading">
+                <h2 id="ai-heading">AI Brain Feed</h2>
+                <div id="ai-feed" style="font-size: 0.95em; color: #cbd5e1;" aria-live="polite">
+                    Waiting for analysis...
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer style="margin-top: 40px; font-size: 0.8em; color: #64748b;">
+        <p>Accessibility Compliance: ARIA 1.1, WCAG 2.1 AA Target.</p>
+    </footer>
+
+    <script>
+        // Clock
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        async function updatedata() {
+            try {
+                const resSpec = await fetch('/api/status').catch(e => null);
+                if (resSpec) {
+                    const data = await resSpec.json();
+                    document.getElementById('reliability').innerText = data.reliability;
+                    document.getElementById('mode').className = "status-ok";
+                }
+                document.getElementById('mode').innerText = "ENTERPRISE (SEMI-AUTO)";
+            } catch (e) {
+                console.log("Offline mode - dashboard running in standalone");
+            }
+        }
+        setInterval(updatedata, 3000); // Slower polling for less jitter
+        updatedata();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,31 @@
+# Use official lightweight Python image
+FROM python:3.12-slim
+
+# Set working directory
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Install system dependencies (e.g. for TA-Lib if we were building it, or gcc)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install dependencies
+# Using --no-cache-dir to keep image small
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy project files
+COPY . .
+
+# Expose port for Web Dashboard
+EXPOSE 8000
+
+# Default command (can be overridden in docker-compose)
+CMD ["python", "run_paper.py"]
