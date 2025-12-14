@@ -6,7 +6,7 @@ finnhub-python>=2.4.19
 sqlalchemy>=2.0.0
 python-dotenv>=1.0.0
 # ta-lib-bin removed due to installation issues; pandas-ta will fallback
-pandas-ta
+# pandas-ta
 APScheduler>=3.10.0
 fastapi>=0.100.0
 uvicorn>=0.23.0
