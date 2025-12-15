@@ -35,6 +35,8 @@ class Config:
     # Execution
     EXECUTION_MODE = os.getenv("EXECUTION_MODE", "PAPER") # PAPER, LIVE (Mock Removed)
     IS_PAPER = EXECUTION_MODE == "PAPER"
+    IS_PAPER = EXECUTION_MODE == "PAPER"
+    IS_PAPER_TRADING = IS_PAPER # Backward Compatibility Alias
     IS_LIVE = EXECUTION_MODE == "LIVE"
     
     # Risk

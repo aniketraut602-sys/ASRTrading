@@ -55,7 +55,7 @@ class TelegramAdminBot:
         
         # Use Linguistic Engine for Free-form
         response = linguistics.handle_freeform(text)
-        await update.message.reply_text(response, parse_mode='Markdown')
+        await update.message.reply_text(response)
 
     async def _check_auth(self, update: Update) -> bool:
         if str(update.effective_user.id) != self.admin_id:
@@ -65,7 +65,22 @@ class TelegramAdminBot:
 
     async def _start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not await self._check_auth(update): return
-        await update.message.reply_text(linguistics.get_greeting(), parse_mode='Markdown')
+        
+        # RCA Fix: Set persistent menu commands for iOS visibility
+        from telegram import BotCommand
+        commands = [
+            BotCommand("status", "System Health Check"),
+            BotCommand("price", "Check Price"),
+            BotCommand("signals", "Scan Markets"),
+            BotCommand("why", "Explain Decision"),
+            BotCommand("pause", "Pause Trading"),
+            BotCommand("resume", "Resume Trading"),
+            BotCommand("kill", "Emergency Stop")
+        ]
+        await self.app.bot.set_my_commands(commands)
+        
+        # RCA Fix: Removed Markdown parsing to prevent iOS crashes
+        await update.message.reply_text(linguistics.get_greeting())
 
     async def _status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not await self._check_auth(update): return
@@ -75,48 +90,48 @@ class TelegramAdminBot:
         status_emoji = "✅" if health['status'] == "HEALTHY" else "⚠️"
         
         msg = (
-            f"{status_emoji} **System Status**\n"
-            f"*   **Mode**: {cfg.EXECUTION_MODE}\n"
-            f"*   **Health**: {health['status']}\n"
-            f"*   **Components**: {len(health['components'])}\n"
-            f"*   **Uptime**: (Live)\n"
+            f"{status_emoji} System Status\n"
+            f"Mode: {cfg.EXECUTION_MODE}\n"
+            f"Health: {health['status']}\n"
+            f"Components: {len(health['components'])}\n"
+            f"Uptime: (Live)\n"
         )
-        await update.message.reply_text(msg, parse_mode='Markdown')
+        await update.message.reply_text(msg, parse_mode=None)
 
     async def _pause(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not await self._check_auth(update): return
-        await update.message.reply_text(linguistics.handle_freeform("pause"), parse_mode='Markdown')
+        await update.message.reply_text(linguistics.handle_freeform("pause"))
         logger.info("ADMIN: PAUSE command received.")
 
     async def _resume(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not await self._check_auth(update): return
-        await update.message.reply_text("▶️ Trade Execution RESUMED.", parse_mode='Markdown')
+        await update.message.reply_text("▶️ Trade Execution RESUMED.")
         logger.info("ADMIN: RESUME command received.")
 
     async def _kill(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not await self._check_auth(update): return
-        await update.message.reply_text("🚨 **KILL SWITCH ACTIVATED**. System Stopping.", parse_mode='Markdown')
+        await update.message.reply_text("🚨 KILL SWITCH ACTIVATED. System Stopping.")
         logger.critical("ADMIN: KILL SWITCH ACTIVATED.")
         
     async def _why(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not await self._check_auth(update): return
         response = linguistics.explain_last_decision()
-        await update.message.reply_text(response, parse_mode='Markdown')
+        await update.message.reply_text(response)
 
     async def _explain(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not await self._check_auth(update): return
         # Placeholder for specific trade ID explanation
-        await update.message.reply_text("Specify a Trade ID to explain (Feature coming in Phase 17). Use /why for last decision.", parse_mode='Markdown')
+        await update.message.reply_text("Specify a Trade ID to explain (Feature coming in Phase 17). Use /why for last decision.")
 
     # --- Proactive Methods (Called by System) ---
     async def notify_monitoring(self, ticker: str, reason: str, technicals: dict):
         if self.app:
             msg = linguistics.announce_monitoring(ticker, reason, technicals)
-            await self.app.bot.send_message(chat_id=self.admin_id, text=msg, parse_mode='Markdown')
+            await self.app.bot.send_message(chat_id=self.admin_id, text=msg)
 
     async def notify_trade(self, trade: dict):
         if self.app:
             msg = linguistics.announce_trade_entry(trade)
-            await self.app.bot.send_message(chat_id=self.admin_id, text=msg, parse_mode='Markdown')
+            await self.app.bot.send_message(chat_id=self.admin_id, text=msg)
 
 telegram_bot = TelegramAdminBot()

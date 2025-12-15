@@ -8,10 +8,14 @@ from asr_trading.strategy.scalping import scalping_strategy
 from asr_trading.execution.order_manager import order_engine
 from asr_trading.execution.risk_manager import risk_engine
 from asr_trading.analysis.reliability import reliability_engine
+from asr_trading.web.telegram_bot import telegram_bot
 
 async def main_loop():
     logger.info("ASR Trading Agent [MOONSHOT EDITION] Starting...")
     
+    # Start Telegram Bot (RCA Step 1 Fix)
+    asyncio.create_task(telegram_bot.start_bot())
+
     # Start Scheduler
     scheduler_service.start()
     
@@ -79,6 +83,9 @@ async def main_loop():
             else:
                 print("Unknown command.")
                 
+        except EOFError:
+            logger.warning("No Input detected (Daemon/Docker mode). Sleeping...")
+            await asyncio.sleep(10)
         except KeyboardInterrupt:
             running = False
         except Exception as e:

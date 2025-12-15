@@ -86,4 +86,4 @@ class RiskManager:
             logger.critical("RISK MANAGER: DAILY LOSS LIMIT HIT! HALTING TRADING.")
             telemetry.record_event("risk_halt_daily_loss", {"loss": self.current_daily_loss})
 
-risk_manager = RiskManager()
+risk_engine = RiskManager()
