@@ -13,6 +13,29 @@ from asr_trading.web.telegram_bot import telegram_bot
 async def main_loop():
     logger.info("ASR Trading Agent [MOONSHOT EDITION] Starting...")
     
+    # --- BROKER INITIALIZATION (Moved from run_paper.py) ---
+    from asr_trading.execution.execution_manager import execution_manager
+    from asr_trading.execution.groww_adapter import GrowwAdapter
+    from asr_trading.execution.broker_adapters import KiteRealAdapter, AlpacaRealAdapter
+    
+    if cfg.IS_PAPER or cfg.IS_LIVE:
+        try:
+            if cfg.GROWW_API_KEY:
+                logger.info("Initializing Groww Adapter...")
+                groww = GrowwAdapter()
+                await groww.connect()
+                if groww.connected:
+                    execution_manager.set_brokers(primary=groww, secondary=None)
+                    logger.info("✅ Registered Groww (India) as PRIMARY broker.")
+                else:
+                    logger.warning("❌ Groww Connection Failed. Falling back...")
+            
+            elif cfg.KITE_API_KEY:
+                execution_manager.set_brokers(primary=KiteRealAdapter(), secondary=None)
+                logger.info("✅ Registered Kite as PRIMARY broker.")
+        except Exception as e:
+            logger.error(f"Broker Init Failed: {e}")
+            
     # Start Telegram Bot (RCA Step 1 Fix)
     asyncio.create_task(telegram_bot.start_bot())
 

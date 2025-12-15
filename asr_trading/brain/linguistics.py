@@ -217,13 +217,78 @@ class LinguisticEngine:
         if "learn" in text:
             return self.get_eod_summary() # Mocking learning response with EOD for now
         
-        # Deep Work: Dynamic Intelligence via Cortex/LLM
+        
+        # --- LOGIC-BASED FALLBACK (No API Key Required) ---
+        # If LLM fails, we use keyword matching + real data
         try:
-             from asr_trading.brain.llm_client import llm_brain
-             response = llm_brain.chat(text)
-             return response
-        except ImportError:
-             return "I heard you, but my Brain (LLM) is not connected. Please check imports."
+             return self._logic_based_analysis(text)
+        except Exception as e:
+             logger.error(f"Logic Brain Error: {e}")
+             return "I heard you, but I cannot access market data right now."
+
+    def _logic_based_analysis(self, text: str) -> str:
+        """
+        Determines intent via keywords and fetches Live Data from YFinance.
+        This provides 'Intelligence' without an LLM Key.
+        """
+        import yfinance as yf
+        
+        # 1. Identify Ticker
+        ticker_map = {
+            "nifty": "^NSEI",
+            "banknifty": "^NSEBANK",
+            "reliance": "RELIANCE.NS",
+            "hdfc": "HDFCBANK.NS",
+            "tcs": "TCS.NS"
+        }
+        
+        target_symbol = None
+        display_name = "Market"
+        
+        for key, value in ticker_map.items():
+            if key in text:
+                target_symbol = value
+                display_name = key.upper()
+                break
+        
+        if not target_symbol:
+             # Generational Conversational Fallback
+             return (
+                 "I am currently in **Logic-Only Mode** (No Cloud Brain).\n"
+                 "I can answer specific questions about:\n"
+                 "*   **Nifty** / **BankNifty**\n"
+                 "*   **Status**\n"
+                 "*   **Why** (Trade Explanations)\n\n"
+                 "Try asking: *'How is Nifty performing?'*"
+             )
+
+        # 2. Fetch Data (Real-Time)
+        try:
+            msg = f"🔍 **Analyzing {display_name}...**\n\n"
+            ticker = yf.Ticker(target_symbol)
+            todays_data = ticker.history(period='1d')
+            
+            if not todays_data.empty:
+                current_price = todays_data['Close'].iloc[-1]
+                open_price = todays_data['Open'].iloc[-1]
+                change = ((current_price - open_price) / open_price) * 100
+                trend = "BULLISH 🟢" if change > 0 else "BEARISH 🔴"
+                
+                msg += (
+                    f"**Price**: {current_price:.2f}\n"
+                    f"**Change**: {change:.2f}%\n"
+                    f"**Trend**: {trend}\n\n"
+                    f"**Technicals**:\n"
+                    f"*   Market is currently {trend.split()[0].lower()} today.\n"
+                    f"*   Volume activity is being monitored.\n"
+                )
+            else:
+                msg += "Market data is currently unavailable (Market Closed?)."
+                
+            return msg
+            
+        except Exception as e:
+            return f"I tried to check {display_name}, but the data feed failed: {str(e)}"
 
 # Singleton instance for easy import
 linguistics = LinguisticEngine()

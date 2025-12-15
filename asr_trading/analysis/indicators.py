@@ -1,36 +1,47 @@
 import pandas as pd
-import pandas_ta as ta
+import numpy as np
 from asr_trading.core.logger import logger
 
 class Indicators:
     @staticmethod
     def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
-        """Adds all core indicators to the dataframe"""
+        """Adds all core indicators to the dataframe using pure Pandas (No External Depts)"""
         if df.empty:
             return df
         
         try:
-            # RSI
-            df['RSI'] = ta.rsi(df['Close'], length=14)
+            # --- RSI (14) ---
+            delta = df['Close'].diff()
+            gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+            loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+            rs = gain / loss
+            df['RSI'] = 100 - (100 / (1 + rs))
+            df['RSI'] = df['RSI'].fillna(50) # Fallback
+
+            # --- MACD (12, 26, 9) ---
+            exp1 = df['Close'].ewm(span=12, adjust=False).mean()
+            exp2 = df['Close'].ewm(span=26, adjust=False).mean()
+            df['MACD'] = exp1 - exp2
+            df['MACD_s'] = df['MACD'].ewm(span=9, adjust=False).mean() # Signal Line
             
-            # MACD
-            macd = ta.macd(df['Close'])
-            df = pd.concat([df, macd], axis=1)
+            # --- Bollinger Bands (20, 2) ---
+            df['SMA_20'] = df['Close'].rolling(window=20).mean()
+            df['STD_20'] = df['Close'].rolling(window=20).std()
+            df['BBL_20_2.0'] = df['SMA_20'] - (df['STD_20'] * 2) # Lower
+            df['BBM_20_2.0'] = df['SMA_20']                      # Mid
+            df['BBU_20_2.0'] = df['SMA_20'] + (df['STD_20'] * 2) # Upper
             
-            # Bollinger Bands
-            bb = ta.bbands(df['Close'], length=20)
-            df = pd.concat([df, bb], axis=1)
+            # --- ATR (14) ---
+            high_low = df['High'] - df['Low']
+            high_close = np.abs(df['High'] - df['Close'].shift())
+            low_close = np.abs(df['Low'] - df['Close'].shift())
+            ranges = pd.concat([high_low, high_close, low_close], axis=1)
+            true_range = ranges.max(axis=1)
+            df['ATR'] = true_range.rolling(14).mean()
             
-            # ATR
-            df['ATR'] = ta.atr(df['High'], df['Low'], df['Close'], length=14)
-            
-            # SMA / EMA
-            df['SMA_50'] = ta.sma(df['Close'], length=50)
-            df['EMA_20'] = ta.ema(df['Close'], length=20)
-            
-            # SuperTrend (pandas_ta usually returns 3 columns: SUPERT, SUPERTd, SUPERTl)
-            st = ta.supertrend(df['High'], df['Low'], df['Close'], length=7, multiplier=3.0)
-            df = pd.concat([df, st], axis=1)
+            # --- SMA / EMA ---
+            df['SMA_50'] = df['Close'].rolling(window=50).mean()
+            df['EMA_20'] = df['Close'].ewm(span=20, adjust=False).mean()
             
             return df
         except Exception as e:
@@ -39,4 +50,8 @@ class Indicators:
 
     @staticmethod
     def get_rsi(df: pd.DataFrame, length=14):
-        return ta.rsi(df['Close'], length=length)
+        delta = df['Close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=length).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=length).mean()
+        rs = gain / loss
+        return 100 - (100 / (1 + rs))

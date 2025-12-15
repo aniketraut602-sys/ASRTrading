@@ -26,6 +26,7 @@ class Config:
     
     # Groww
     GROWW_API_KEY = os.getenv("GROWW_API_KEY", "")
+    GROWW_API_SECRET = os.getenv("GROWW_API_SECRET", "")
 
     # Trading Rules (Enterprise Hardening)
     MIN_CONFIDENCE_SCORE = float(os.getenv("MIN_CONFIDENCE_SCORE", "70.0")) # Blueprint Requirement: >= 70%
