@@ -1,4 +1,4 @@
-from asr_trading.brain.model_server import model_server
+from asr_trading.brain.learning import cortex
 from asr_trading.core.logger import logger
 
 class EnsembleAgent:
@@ -15,10 +15,8 @@ class EnsembleAgent:
         """
         # Get Model Prediction
         # Ensure model is fresh
-        model_server.load_model()
-        pred = model_server.predict(features)
-        
-        model_prob = pred["prob"]
+        cortex.brain.load_model()
+        model_prob = cortex.brain.predict_win_probability(features)
         
         # Weighted Avg of Probabilities (assuming rule_conf is a prob 0-1)
         final_score = (self.w_rule * rule_conf) + (self.w_model * model_prob)
