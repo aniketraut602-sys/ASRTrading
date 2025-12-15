@@ -217,10 +217,13 @@ class LinguisticEngine:
         if "learn" in text:
             return self.get_eod_summary() # Mocking learning response with EOD for now
         
-        return (
-            "I heard you, but I'm not sure how to respond to that specifically yet.\n"
-            "You can ask me 'Status', 'Why?', or 'What should I look at?'."
-        )
+        # Deep Work: Dynamic Intelligence via Cortex/LLM
+        try:
+             from asr_trading.brain.llm_client import llm_brain
+             response = llm_brain.chat(text)
+             return response
+        except ImportError:
+             return "I heard you, but my Brain (LLM) is not connected. Please check imports."
 
 # Singleton instance for easy import
 linguistics = LinguisticEngine()
