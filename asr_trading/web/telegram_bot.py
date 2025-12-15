@@ -54,6 +54,29 @@ class TelegramAdminBot:
         if not await self._check_auth(update): return
         text = update.message.text.strip()
         
+        # Smart Command Detection (Slash-less)
+        # Verify if the user typed "approve plan_123" without slash
+        cmd = text.split()[0].lower()
+        if cmd == "approve":
+            # Inject arguments manually and call _approve
+            context.args = text.split()[1:]
+            await self._approve(update, context)
+            return
+            
+        if cmd in ["status", "help", "pause", "resume", "kill"]:
+            # Route simple keywords to their handlers
+            # Note: This is a hacky dispatcher but effective for "Smart" feel
+            handler_map = {
+                "status": self._status,
+                "pause": self._pause,
+                "resume": self._resume,
+                "kill": self._kill,
+                "why": self._why
+            }
+            if cmd in handler_map:
+                await handler_map[cmd](update, context)
+                return
+
         # Use Linguistic Engine for Free-form
         response = linguistics.handle_freeform(text)
         await update.message.reply_text(response)
