@@ -33,6 +33,7 @@ class TelegramAdminBot:
             self.app.add_handler(CommandHandler("kill", self._kill))
             self.app.add_handler(CommandHandler("why", self._why))
             self.app.add_handler(CommandHandler("explain", self._explain))
+            self.app.add_handler(CommandHandler("approve", self._approve))
             
             # UX: Handle plain text commands (Case Insensitive)
             self.app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), self._handle_text))
@@ -123,7 +124,46 @@ class TelegramAdminBot:
         # Placeholder for specific trade ID explanation
         await update.message.reply_text("Specify a Trade ID to explain (Feature coming in Phase 17). Use /why for last decision.")
 
+    async def _approve(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if not await self._check_auth(update): return
+        
+        try:
+            # Expected format: /approve <PLAN_ID>
+            args = context.args
+            if not args:
+                await update.message.reply_text("Usage: /approve <PLAN_ID>")
+                return
+            
+            plan_id = args[0]
+            
+            # Avoid Circular Import at Module Level
+            from asr_trading.execution.execution_manager import execution_manager
+            result = await execution_manager.confirm_execution(plan_id)
+            
+            await update.message.reply_text(f"🚀 Execution Result: {result.get('status')}")
+            
+        except Exception as e:
+            logger.error(f"Approval Failed: {e}")
+            await update.message.reply_text(f"❌ Error: {str(e)}")
+
     # --- Proactive Methods (Called by System) ---
+    async def request_approval(self, plan_data: dict):
+        """
+        Notify user for Semi-Auto Approval.
+        """
+        if self.app:
+            plan_id = plan_data['plan_id']
+            msg = (
+                f"✋ **Approval Required**\n\n"
+                f"Strategy: {plan_data['strategy']}\n"
+                f"Action: {plan_data['action']} {plan_data['ticker']}\n"
+                f"Size: {plan_data['size']}\n"
+                f"Confidence: {plan_data['confidence']}%\n\n"
+                f"To Execute:\n"
+                f"Type `/approve {plan_id}`"
+            )
+            await self.app.bot.send_message(chat_id=self.admin_id, text=msg)
+
     async def notify_monitoring(self, ticker: str, reason: str, technicals: dict):
         if self.app:
             msg = linguistics.announce_monitoring(ticker, reason, technicals)

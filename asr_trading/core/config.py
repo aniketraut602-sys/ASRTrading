@@ -39,6 +39,11 @@ class Config:
     IS_PAPER_TRADING = IS_PAPER # Backward Compatibility Alias
     IS_LIVE = EXECUTION_MODE == "LIVE"
     
+    # Execution Flow
+    # AUTO: Bot decides and trades.
+    # SEMI: Bot proposes, User approves via Telegram.
+    EXECUTION_TYPE = os.getenv("EXECUTION_TYPE", "SEMI") # Default to Safe Mode
+    
     # Risk
     MAX_OPEN_POSITIONS = 5
     RISK_PER_TRADE_PERCENT = 0.02 # 2% Rule

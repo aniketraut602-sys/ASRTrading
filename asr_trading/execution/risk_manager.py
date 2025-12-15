@@ -26,6 +26,16 @@ class RiskManager:
         # In LIVE mode, this should be updated via sync_balance()
         self.total_capital = 100000.0 
 
+    def get_lot_size(self, symbol: str) -> int:
+        """
+        Returns the fixed lot size for indices, or 1 for stocks.
+        """
+        sym = symbol.upper()
+        if "NIFTY" in sym and "BANK" not in sym: return 75
+        if "BANKNIFTY" in sym: return 15
+        if "FINNIFTY" in sym: return 40
+        return 1
+
     def check_trade(self, symbol: str, price: float, strategy_id: str, confidence: float, volatility: float = 0.0) -> Dict[str, Any]:
         """
         Returns {"allowed": bool, "reason": str, "max_size": int}
@@ -46,6 +56,22 @@ class RiskManager:
         
         if max_qty <= 0:
              return {"allowed": False, "reason": "Capital insufficient for 1 lot", "max_size": 0}
+
+        # 12.1 Options Lot Logic (Fixed Sizes)
+        # If the symbol has a defined lot size (e.g. NIFTY=75), we enforce multiples or single lots
+        fixed_lot = self.get_lot_size(symbol)
+        if fixed_lot > 1:
+            # For Options/Indices, we usually start with 1 Lot in risk-managed mode
+            # Check if capital allows at least 1 lot
+            cost_1_lot = fixed_lot * price
+            if risk_amt < cost_1_lot:
+                 # If 2% risk is less than cost of 1 lot, we might block OR allow 1 lot if within global max loss
+                 # Here, we strictly block to fit risk profile
+                 return {"allowed": False, "reason": f"Risk ({risk_amt}) < Cost of 1 Lot ({cost_1_lot})", "max_size": 0}
+            
+            # Default to 1 Lot for "First Version" of Options Logic
+            max_qty = fixed_lot
+            logger.info(f"RiskManager: Enforcing Fixed Lot Size for {symbol}: {max_qty}")
 
         # 18.3 Capital Preservation: Logic
         # A. Soft Drawdown Brake

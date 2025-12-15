@@ -38,6 +38,7 @@ class ExecutionManager:
         self.primary: Optional[BrokerAdapter] = None
         self.secondary: Optional[BrokerAdapter] = None
         self.used_plan_ids = set() # Idempotency check
+        self.pending_plans = {}    # Semi-Auto Holding Area
         self.lock = asyncio.Lock()
 
     def set_brokers(self, primary: BrokerAdapter, secondary: BrokerAdapter):
@@ -71,8 +72,49 @@ class ExecutionManager:
             if plan.plan_id in self.used_plan_ids:
                 logger.warning(f"Execution: Duplicate Plan ID {plan.plan_id}. Ignoring.")
                 return {"status": "IGNORED_DUPLICATE"}
+        
+        # 1.5 Semi-Auto Intercept
+        if cfg.EXECUTION_TYPE == "SEMI":
+            # Store and Notify
+            self.pending_plans[plan.plan_id] = plan
+            logger.info(f"ExecutionManager: Plan {plan.plan_id} HELD for Approval (SEMI Mode)")
+            
+            # Request Approval
+            await telegram_bot.request_approval({
+                "plan_id": plan.plan_id,
+                "strategy": plan.plan_code,
+                "action": plan.side,
+                "ticker": plan.symbol,
+                "size": plan.quantity,
+                "confidence": plan.confidence
+            })
+            return {"status": "PENDING_APPROVAL"}
+
+        # Mark as used (Auto Mode)
+        async with self.lock:
             self.used_plan_ids.add(plan.plan_id)
 
+    async def confirm_execution(self, plan_id: str) -> Dict:
+        """
+        Called by Telegram Bot to release a pending plan.
+        """
+        if plan_id not in self.pending_plans:
+            return {"status": "PLAN_NOT_FOUND_OR_EXPIRED"}
+        
+        plan = self.pending_plans.pop(plan_id)
+        
+        # Mark as used before execution
+        async with self.lock:
+             self.used_plan_ids.add(plan.plan_id)
+             
+        logger.info(f"ExecutionManager: Plan {plan_id} APPROVED by User. Executing.")
+        
+        # Call Internal Execute Logic directly to bypass the check (needs refactor or duplicate logic)
+        # To reuse logic, we temporarily switch mode or call a private method.
+        # Cleaner: Extract actual broker call to _send_to_brokers
+        return await self._send_to_brokers(plan)
+
+    async def _send_to_brokers(self, plan: TradePlan) -> Dict:
         # 2. Primary Path
         if self.primary:
             try:
