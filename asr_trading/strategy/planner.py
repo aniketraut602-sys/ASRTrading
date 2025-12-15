@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Dict
 from asr_trading.strategy.selector import StrategyProposal
-from asr_trading.execution.risk_manager import risk_manager
-from asr_trading.execution.risk_manager import risk_manager
+from asr_trading.execution.risk_manager import risk_engine
 from asr_trading.core.logger import logger
 from asr_trading.core.auditor import Auditor
 
@@ -28,7 +27,7 @@ class PlannerEngine:
         
         # 1. Consult Risk Manager
         # 18.3 Capital Preservation: Pass Volatility
-        risk = risk_manager.check_trade(
+        risk = risk_engine.check_trade(
             proposal.symbol, 
             current_price, 
             proposal.strategy_id, 
