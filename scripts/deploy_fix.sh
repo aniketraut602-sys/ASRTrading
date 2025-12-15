@@ -7,6 +7,10 @@ echo "Date: $(date)"
 echo "[*] Pulling latest code..."
 git pull origin main
 
+echo "[*] Installing Dependencies..."
+pip install -r requirements.txt
+
+
 # 2. Run Prevention/Cleanup
 echo "[*] Resetting Governance (System Unlock)..."
 python3 scripts/reset_governance.py
