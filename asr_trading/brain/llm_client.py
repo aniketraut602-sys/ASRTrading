@@ -33,6 +33,10 @@ class LLMClient:
             else:
                 logger.error(f"LLM Error: {response.text}")
                 return "LLM unavailable."
+        except Exception as e:
+            logger.error(f"LLM Connection Failed: {e}")
+            return "LLM Connection Error (Is Ollama running?)"
+
     def chat(self, user_input: str) -> str:
         """
         General Conversation with Context Awareness.
