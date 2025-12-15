@@ -34,6 +34,7 @@ class TelegramAdminBot:
             self.app.add_handler(CommandHandler("why", self._why))
             self.app.add_handler(CommandHandler("explain", self._explain))
             self.app.add_handler(CommandHandler("approve", self._approve))
+            self.app.add_handler(CommandHandler("mode", self._mode))
             
             # UX: Handle plain text commands (Case Insensitive)
             self.app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), self._handle_text))
@@ -63,7 +64,7 @@ class TelegramAdminBot:
             await self._approve(update, context)
             return
             
-        if cmd in ["status", "help", "pause", "resume", "kill"]:
+        if cmd in ["status", "help", "pause", "resume", "kill", "balance", "mode"]:
             # Route simple keywords to their handlers
             # Note: This is a hacky dispatcher but effective for "Smart" feel
             handler_map = {
@@ -71,8 +72,17 @@ class TelegramAdminBot:
                 "pause": self._pause,
                 "resume": self._resume,
                 "kill": self._kill,
-                "why": self._why
+                "why": self._why,
+                "balance": self._balance,
+                "mode": self._mode
             }
+            
+            # Special Handling for Arguments (e.g., "mode auto")
+            if cmd == "mode":
+                 parts = text.split()
+                 if len(parts) > 1:
+                     context.args = parts[1:]
+            
             if cmd in handler_map:
                 await handler_map[cmd](update, context)
                 return
@@ -146,6 +156,54 @@ class TelegramAdminBot:
         if not await self._check_auth(update): return
         # Placeholder for specific trade ID explanation
         await update.message.reply_text("Specify a Trade ID to explain (Feature coming in Phase 17). Use /why for last decision.")
+        
+    async def _mode(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if not await self._check_auth(update): return
+        
+        # Parse argument: /mode AUTO or /mode SEMI
+        # If no arg, check status
+        args = context.args
+        if not args:
+            await update.message.reply_text(f"Current Mode: **{cfg.EXECUTION_TYPE}**\nTo change: `/mode AUTO` or `/mode SEMI`")
+            return
+            
+        new_mode = args[0].upper()
+        if new_mode not in ["AUTO", "SEMI"]:
+             await update.message.reply_text("Invalid Mode. Use AUTO or SEMI.")
+             return
+             
+        # Switch Mode
+        cfg.EXECUTION_TYPE = new_mode
+        logger.warning(f"ADMIN: Execution Mode switched to {new_mode}")
+        await update.message.reply_text(f"⚙️ System switched to **{new_mode}** Mode.")
+        
+    async def _balance(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if not await self._check_auth(update): return
+        
+        msg = "🏦 Checking Balance..."
+        status_msg = await update.message.reply_text(msg)
+        
+        # Avoid Circular Import
+        from asr_trading.execution.execution_manager import execution_manager
+        
+        bal = 0.0
+        currency = "INR"
+        broker_name = "Paper"
+        
+        if execution_manager.primary:
+            broker_name = execution_manager.primary.get_name()
+            # Dynamic Balance Check
+            if hasattr(execution_manager.primary, "get_balance"):
+                bal = await execution_manager.primary.get_balance()
+            else:
+                bal = -1.0 # Not Supported
+        
+        if bal == -1.0:
+            final_msg = f"💳 Broker: {broker_name}\nBalance: N/A (Method not supported)"
+        else:
+            final_msg = f"💳 Broker: {broker_name}\nBalance: ₹{bal:,.2f}"
+            
+        await status_msg.edit_text(final_msg)
 
     async def _approve(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not await self._check_auth(update): return
