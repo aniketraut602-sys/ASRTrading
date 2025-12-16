@@ -42,8 +42,8 @@ async def lifespan(app: FastAPI):
                 logger.error(f"FATAL: Telegram Bot Startup Failed: {e}")
                 SYSTEM_STATE["bot_active"] = False
                 
-        bot_task = current_loop.create_task(safe_start_bot())
-        SYSTEM_STATE["bot_active"] = True # Tentative, will update if fails
+        # bot_task = current_loop.create_task(safe_start_bot())
+        SYSTEM_STATE["bot_active"] = False # Disabling Bot for Deployment Stability
     except RuntimeError:
          # Should not happen in uvicorn
          pass
