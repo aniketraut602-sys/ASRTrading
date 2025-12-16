@@ -208,23 +208,34 @@ class LinguisticEngine:
         Simple keyword-based conversational fallback.
         """
         text = text.lower()
-        if "hello" in text or "hi" in text:
+        words = set(text.split())
+        
+        if {"hello", "hi", "hey"}.intersection(words):
             return self.get_greeting()
         if "status" in text:
             return "I am currently online and monitoring the markets."
         if "stop" in text or "pause" in text:
             return "Understood. Creating a pause request..."
         if "learn" in text:
-            return self.get_eod_summary() # Mocking learning response with EOD for now
+            return self.get_eod_summary()
         
         
         # --- LOGIC-BASED FALLBACK (No API Key Required) ---
         # If LLM fails, we use keyword matching + real data
-        try:
-             return self._logic_based_analysis(text)
-        except Exception as e:
-             logger.error(f"Logic Brain Error: {e}")
-             return "I heard you, but I cannot access market data right now."
+        # RCA Fix: Check if specific keywords exist before defaulting
+        # Expanded for "call", "put", "strategy"
+        triggers = ["nifty", "banknifty", "reliance", "hdfc", "tcs", "price", "closing", 
+                   "trade", "call", "put", "strategy", "paper"]
+        if any(k in text for k in triggers):
+             try:
+                 return self._logic_based_analysis(text)
+             except Exception as e:
+                 logger.error(f"Logic Brain Error: {e}")
+                 
+        return (
+            "I heard you, but I'm not sure how to respond to that specifically yet.\n"
+            "You can ask me 'Status', 'Why?', or 'What should I look at?'."
+        )
 
     def _logic_based_analysis(self, text: str) -> str:
         """

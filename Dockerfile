@@ -28,4 +28,4 @@ COPY . .
 EXPOSE 8000
 
 # Default command (can be overridden in docker-compose)
-CMD ["python", "run_paper.py"]
+CMD ["python", "-m", "asr_trading.web.server"]

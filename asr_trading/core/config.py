@@ -22,7 +22,8 @@ class Config:
 
     # Telegram Bot
     TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
-    TELEGRAM_ADMIN_ID = os.getenv("TELEGRAM_ADMIN_ID", "")
+    # RCA Fix: STRICTLY HARDCODE Admin ID to bypass stale Env vars
+    TELEGRAM_ADMIN_ID = "8418929814"
     
     # Groww
     GROWW_API_KEY = os.getenv("GROWW_API_KEY", "")
@@ -36,8 +37,8 @@ class Config:
     # Execution
     EXECUTION_MODE = os.getenv("EXECUTION_MODE", "PAPER") # PAPER, LIVE (Mock Removed)
     IS_PAPER = EXECUTION_MODE == "PAPER"
-    IS_PAPER = EXECUTION_MODE == "PAPER"
     IS_PAPER_TRADING = IS_PAPER # Backward Compatibility Alias
+    CAPITAL = 1000000.0 # Standard Deployment Capital
     IS_LIVE = EXECUTION_MODE == "LIVE"
     
     # Execution Flow

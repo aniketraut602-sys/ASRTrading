@@ -44,23 +44,41 @@ class CandleMatcher:
         curr = df.iloc[-1]
         prev = df.iloc[-2]
         
+        # Safe Accessor
+        def get_val(row, key):
+             # Try Title Case (yfinance/pandas-ta) then Lower Case
+             if hasattr(row, key.title()): return getattr(row, key.title())
+             if hasattr(row, key.lower()): return getattr(row, key.lower())
+             # Try dictionary/Series index
+             if key.title() in row: return row[key.title()]
+             if key.lower() in row: return row[key.lower()]
+             return 0.0
+
+        O = get_val(curr, "open")
+        H = get_val(curr, "high")
+        L = get_val(curr, "low")
+        C = get_val(curr, "close")
+        
+        prev_O = get_val(prev, "open")
+        prev_C = get_val(prev, "close")
+        
         # Doji
-        if CandleMatcher.is_doji(curr.open, curr.high, curr.low, curr.close):
+        if CandleMatcher.is_doji(O, H, L, C):
             patterns.append({"id": "CDL_DOJI", "name": "Doji", "side": "NEUTRAL", "conf": 0.6})
 
         # Hammer (Bullish)
-        if CandleMatcher.is_hammer(curr.open, curr.high, curr.low, curr.close):
+        if CandleMatcher.is_hammer(O, H, L, C):
             patterns.append({"id": "CDL_HAMMER", "name": "Hammer", "side": "BULLISH", "conf": 0.7})
 
         # Engulfing
         # Bullish: Prev Red, Curr Green, Curr Open < Prev Close, Curr Close > Prev Open
-        if (prev.close < prev.open) and (curr.close > curr.open):
-            if (curr.open <= prev.close) and (curr.close >= prev.open):
+        if (prev_C < prev_O) and (C > O):
+            if (O <= prev_C) and (C >= prev_O):
                 patterns.append({"id": "CDL_ENGULFING_BULL", "name": "Bullish Engulfing", "side": "BULLISH", "conf": 0.8})
         
         # Bearish Engulfing
-        if (prev.close > prev.open) and (curr.close < curr.open):
-             if (curr.open >= prev.close) and (curr.close <= prev.open):
+        if (prev_C > prev_O) and (C < O):
+             if (O >= prev_C) and (C <= prev_O):
                 patterns.append({"id": "CDL_ENGULFING_BEAR", "name": "Bearish Engulfing", "side": "BEARISH", "conf": 0.8})
 
         return patterns

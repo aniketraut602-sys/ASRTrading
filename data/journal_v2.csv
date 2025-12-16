@@ -1,0 +1,3 @@
+timestamp,strategy_id,symbol,side,quantity,entry_price,exit_price,pnl,outcome,confidence,RSI,MACD,ATR,SMA_50,Volatility
+1765888875.1628902,A,REGTEST,UNKNOWN,0,0.0,0.0,350.0,1,0.0,0.0,0.0,0.0,0.0,0.0
+1765890496.99068,A,REGTEST,UNKNOWN,0,0.0,0.0,350.0,1,0.0,0.0,0.0,0.0,0.0,0.0

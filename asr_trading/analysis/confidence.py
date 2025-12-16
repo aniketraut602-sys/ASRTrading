@@ -26,8 +26,8 @@ class ConfidenceCalculator:
             elif rsi > 70: score += 20 # Overbought
 
         # 2. MACD Confluence (Weight: 20%)
-        macd = latest.get('MACD_12_26_9', 0)
-        signal = latest.get('MACDs_12_26_9', 0)
+        macd = latest.get('MACD', 0)
+        signal = latest.get('MACD_Signal', 0)
         if signal_type == 'BUY' and macd > signal: score += 20
         if signal_type == 'SELL' and macd < signal: score += 20
         

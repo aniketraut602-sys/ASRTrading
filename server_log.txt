@@ -1,0 +1,22 @@
+2025-12-16 10:37:10,994 - ASR_Trading - INFO - DataManager initialized with YFinance as primary
+2025-12-16 10:37:11,271 - ASR_Trading - INFO - ASR Trading Agent [MOONSHOT EDITION] Starting...
+2025-12-16 10:37:11,290 - ASR_Trading - WARNING - No Polygon Key. Using Yahoo Finance as PRIMARY.
+2025-12-16 10:37:11,291 - ASR_Trading - INFO - YahooFinanceProvider: Ready (Stateless).
+2025-12-16 10:37:11,292 - ASR_Trading - INFO - Avionics: Service 'feed_primary_YAHOO_FINANCE' registered with 60.0s heartbeat.
+2025-12-16 10:37:11,292 - ASR_Trading - INFO - FeedManager: Registered PRIMARY provider: YAHOO_FINANCE
+2025-12-16 10:37:12,419 - ASR_Trading - INFO - BrainStem model loaded from model_registry/brain_model_v1.joblib
+2025-12-16 10:37:12,423 - ASR_Trading - INFO - ExecutionManager: Initializing in LIVE/MOCK mode
+2025-12-16 10:37:12,840 - ASR_Trading - INFO - Initializing Groww Adapter...
+Ready to Groww!
+2025-12-16 10:37:13,105 - ASR_Trading - INFO - GrowwAdapter: Connected successfully via API.
+2025-12-16 10:37:13,106 - ASR_Trading - INFO - [OK] Registered Groww (India) as PRIMARY broker.
+2025-12-16 10:37:13,112 - ASR_Trading - INFO - Data Scheduler started.
+
+==================================================
+ASR TRADING AGENT - ENTERPRISE COMMAND CENTER
+Mode: LIVE
+Serving Web UI at http://localhost:8000
+Type /help for commands
+==================================================
+
+ASR> 2025-12-16 10:37:13,766 - ASR_Trading - INFO - Telegram Bot Starting Polling (v20+ Async)...

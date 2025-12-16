@@ -86,6 +86,26 @@ class HealthMonitor:
         
         return status_map
 
+    def get_system_health(self) -> Dict[str, Any]:
+        """
+        Backwards compatibility / detailed summary wrapper.
+        Returns a dict with 'status' (HEALTHY/DEGRADED/CRITICAL) and 'components'.
+        """
+        details = self.check_health()
+        overall = "HEALTHY"
+        for s in details.values():
+            if s == ServiceStatus.CRITICAL:
+                overall = "CRITICAL"
+                break
+            if s == ServiceStatus.DEGRADED and overall != "CRITICAL":
+                overall = "DEGRADED"
+        
+        return {
+            "status": overall,
+            "components": {k: v.value for k, v in details.items()},
+            "timestamp": time.time()
+        }
+
 avionics_monitor = HealthMonitor()
 
 class CircuitBreakerOpenException(Exception):

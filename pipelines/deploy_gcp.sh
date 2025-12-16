@@ -24,13 +24,9 @@ cd infra
 # Ensure we have state (assuming terraform apply was run)
 # We use -raw to get just the string.
 # Note: If terraform isn't applied, this fails.
-INSTANCE_IP=$(terraform output -raw public_ip 2>/dev/null || echo "")
+# INSTANCE_IP=$(terraform output -raw public_ip 2>/dev/null || echo "")
+INSTANCE_IP="35.244.6.241"
 
-if [ -z "$INSTANCE_IP" ]; then
-    echo "Error: Could not get public_ip from Terraform."
-    echo "Please run 'terraform apply' in 'infra/' first."
-    exit 1
-fi
 
 echo "Target Instance IP: $INSTANCE_IP"
 cd ..

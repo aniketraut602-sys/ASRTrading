@@ -3,7 +3,9 @@ import asyncio
 from asr_trading.core.logger import logger
 from asr_trading.core.config import cfg
 from asr_trading.data.scheduler import scheduler_service
-from asr_trading.data.ingestion import data_manager
+from asr_trading.data.feed_manager import feed_manager
+from asr_trading.data.providers.yahoo import YahooFinanceProvider
+from asr_trading.data.providers.polygon import PolygonProvider
 from asr_trading.strategy.scalping import scalping_strategy
 from asr_trading.execution.order_manager import order_engine
 from asr_trading.execution.risk_manager import risk_engine
@@ -13,7 +15,25 @@ from asr_trading.web.telegram_bot import telegram_bot
 async def main_loop():
     logger.info("ASR Trading Agent [MOONSHOT EDITION] Starting...")
     
-    # --- BROKER INITIALIZATION (Moved from run_paper.py) ---
+    # --- DATA FEED INITIALIZATION ---
+    try:
+        # 1. Primary Feed
+        if cfg.POLYGON_API_KEY:
+            logger.info("Initializing Polygon.io Feed...")
+            poly = PolygonProvider()
+            await poly.connect()
+            feed_manager.register_provider("PRIMARY", poly)
+        else:
+            logger.warning("No Polygon Key. Using Yahoo Finance as PRIMARY.")
+            yf_prov = YahooFinanceProvider()
+            await yf_prov.connect()
+            feed_manager.register_provider("PRIMARY", yf_prov)
+            
+    except Exception as e:
+        logger.critical(f"Data Feed Init Failed: {e}")
+        # We continue, but FeedManager will return None/Cache
+    
+    # --- BROKER INITIALIZATION ---
     from asr_trading.execution.execution_manager import execution_manager
     from asr_trading.execution.groww_adapter import GrowwAdapter
     from asr_trading.execution.broker_adapters import KiteRealAdapter, AlpacaRealAdapter
@@ -26,18 +46,20 @@ async def main_loop():
                 await groww.connect()
                 if groww.connected:
                     execution_manager.set_brokers(primary=groww, secondary=None)
-                    logger.info("✅ Registered Groww (India) as PRIMARY broker.")
+                    logger.info("[OK] Registered Groww (India) as PRIMARY broker.")
                 else:
-                    logger.warning("❌ Groww Connection Failed. Falling back...")
+                    logger.warning("[X] Groww Connection Failed. Falling back...")
             
             elif cfg.KITE_API_KEY:
                 execution_manager.set_brokers(primary=KiteRealAdapter(), secondary=None)
-                logger.info("✅ Registered Kite as PRIMARY broker.")
+                logger.info("[OK] Registered Kite as PRIMARY broker.")
         except Exception as e:
             logger.error(f"Broker Init Failed: {e}")
             
-    # Start Telegram Bot (RCA Step 1 Fix)
-    asyncio.create_task(telegram_bot.start_bot())
+    # Start Telegram Bot
+    # NOTE: The Web Server (server.py) is the primary owner of the Telegram Bot.
+    # If running CLI only, we can uncomment this, but usually we run server.py.
+    logger.info("Bot startup deferred. Run 'python -m asr_trading.web.server' for full Bot/Web support.")
 
     # Start Scheduler
     scheduler_service.start()

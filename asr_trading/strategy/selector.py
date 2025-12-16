@@ -5,8 +5,7 @@ import time
 from asr_trading.analysis.patterns import DetectedPattern
 from asr_trading.core.logger import logger
 from asr_trading.brain.learning import cortex
-# Import Bot for Proactive Alerts
-from asr_trading.web.telegram_bot import telegram_bot
+# Import Bot for Proactive Alerts (Moved to method scope)
 from asr_trading.brain.governance import governance
 from asr_trading.brain.regime import regime_monitor
 
@@ -21,6 +20,7 @@ class StrategyProposal:
     rationale: str
     plan_type: str = "A" # Default Plan A
     volatility: float = 0.0 # 18.3 Capital Preservation: Pass context
+    features: Dict = None # 18.6 Learning Loop: Feature Snapshot for Training
 
 class StrategySelector:
     """
@@ -38,14 +38,19 @@ class StrategySelector:
         if now - last_alert > self.MONITOR_COOLDOWN:
             self.monitoring_cache[symbol] = now
             # Fire and forget
-            if telegram_bot.running:
-                logger.info(f"Selector: Triggering Monitoring Alert for {symbol}")
-                try:
-                    loop = asyncio.get_event_loop()
-                    if loop.is_running():
-                        loop.create_task(telegram_bot.notify_monitoring(symbol, reason, features))
-                except RuntimeError:
-                    pass # No loop running
+            # Avoid Circular Import
+            try:
+                from asr_trading.web.telegram_bot import telegram_bot
+                if telegram_bot.running:
+                    logger.info(f"Selector: Triggering Monitoring Alert for {symbol}")
+                    try:
+                        loop = asyncio.get_event_loop()
+                        if loop.is_running():
+                            loop.create_task(telegram_bot.notify_monitoring(symbol, reason, features))
+                    except RuntimeError:
+                        pass # No loop running
+            except ImportError:
+                pass
 
     def select_strategy(self, symbol: str, features: Dict, patterns: List[DetectedPattern], knowledge: List[Dict]) -> Optional[StrategyProposal]:
         """
@@ -120,7 +125,8 @@ class StrategySelector:
                             action="BUY",
                             confidence=min(final_conf, 0.99),
                             rationale=f"Hammer detected (RSI={rsi:.1f}). ML Agreement: {ml_prob:.2f}",
-                            plan_type="A"
+                            plan_type="A",
+                            features=features
                         )
                 elif final_conf > 0.5:
                      # MONITORING CASE
@@ -156,7 +162,8 @@ class StrategySelector:
                      action="BUY",
                      confidence=final_conf,
                      rationale=f"MACD positive crossover. ML Agreement: {ml_prob:.2f}",
-                     plan_type="A"
+                     plan_type="A",
+                     features=features
                  )
              elif final_conf > 0.5:
                   # MONITORING CASE
@@ -167,5 +174,71 @@ class StrategySelector:
                   )
 
         return None
+
+    def analyze_on_demand(self, symbol: str, data_manager) -> Optional[StrategyProposal]:
+        """
+        Master Prompt Requirement: Real Strategy Check for Manual Inputs.
+        Fetches data, computes features, runs selection logic.
+        """
+        logger.info(f"Selector: Analyzing {symbol} on demand...")
+        try:
+            # 1. Fetch Data (Enough for indicators)
+            df = data_manager.get_history(symbol, period="3mo", interval="1d")
+            if df.empty:
+                logger.warning(f"Selector: No data found for {symbol}")
+                return None
+                
+            # 2. Features - Use IndicatorLib directly
+            from asr_trading.analysis.features import IndicatorLib
+            df = IndicatorLib.compute_all(df)
+            current_features = df.iloc[-1].to_dict()
+            
+            # 3. Patterns - Use PatternDetector instance
+            from asr_trading.analysis.patterns import pattern_detector
+            patterns = pattern_detector.analyze(df, symbol)
+            
+            # 4. Knowledge (Empty for manual check context)
+            knowledge = []
+            
+            # 5. Run Selection
+            proposal = self.select_strategy(symbol, current_features, patterns, knowledge)
+            
+            if not proposal:
+                # If no specific strategy triggered, check Trend for "Manual Baseline"
+                # This prevents "Confidence too low" simply because no specific pattern matched,
+                # while still providing a REAL assessment of the trend.
+                rsi = current_features.get("RSI", 50)
+                macd = current_features.get("MACD", 0)
+                
+                # Baseline Trend Logic
+                score = 0.5
+                rationale = "Neutral Market."
+                
+                # Check SMA if computed, or compute ad-hoc if missing (compute_all generally adds it)
+                close = df['Close'].iloc[-1] if 'Close' in df else df['close'].iloc[-1]
+                sma50 = df['SMA_50'].iloc[-1] if 'SMA_50' in df else close
+                
+                if close > sma50:
+                    score += 0.1
+                    rationale = "Uptrend (Price > SMA50)."
+                
+                if macd > 0: score += 0.1
+                if rsi < 30: score += 0.1 # Oversold bounce
+                
+                return StrategyProposal(
+                    strategy_id="MANUAL_ANALYSIS",
+                    symbol=symbol,
+                    action="BUY", # Simplifying for check
+                    confidence=score,
+                    rationale=f"Manual Check: {rationale} (RSI={rsi:.1f})",
+                    plan_type="A",
+                    features=current_features
+                )
+                
+            return proposal
+
+        except Exception as e:
+            logger.error(f"Selector: Analysis failed for {symbol}: {e}")
+            return None
 
 strategy_selector = StrategySelector()

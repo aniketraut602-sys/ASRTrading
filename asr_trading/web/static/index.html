@@ -3,150 +3,258 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>ASR Moonshot Command Center</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASR Trading Command Center</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* High Contrast & Accessibility Base */
-        body {
-            background-color: #0f172a;
-            color: #e2e8f0;
-            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        :focus {
-            outline: 3px solid #facc15;
-            /* Yellow focus ring for keyboard nav */
-            outline-offset: 2px;
-        }
-
-        header {
-            border-bottom: 2px solid #475569;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 1.8rem;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: #1e293b;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-        }
-
-        h2 {
-            margin-top: 0;
-            border-bottom: 1px solid #475569;
-            padding-bottom: 10px;
-            font-size: 1.25rem;
-        }
-
-        /* Utility Classes for Status */
-        .status-ok {
-            color: #4ade80;
-            font-weight: bold;
-        }
-
-        .status-warn {
-            color: #facc15;
-            font-weight: bold;
-        }
-
-        .status-err {
-            color: #f87171;
-            font-weight: bold;
-        }
-
-        /* Skip Link */
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 0;
-            background: #000;
-            color: #fff;
-            padding: 8px;
-            z-index: 100;
-        }
-
-        .skip-link:focus {
+        .modal-overlay {
+            position: fixed;
             top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            color: #fff;
+        }
+
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
         }
     </style>
 </head>
 
 <body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <!-- Hidden live region for announcments -->
+    <div id="a11y-announcer" class="sr-only" role="alert" aria-live="assertive"></div>
+
+    <!-- ACCESSIBLE MODAL -->
+    <div id="custom-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+        style="display:none;">
+        <div class="modal-content">
+            <h2 id="modal-title">Confirmation</h2>
+            <div id="modal-body">Message goes here</div>
+            <div class="modal-actions">
+                <button id="btn-modal-yes" class="btn primary">Confirm</button>
+                <button id="btn-modal-cancel" class="btn secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <header role="banner">
-        <h1>ASR Trading <span style="font-size:0.6em; color:#94a3b8" aria-label="Moonshot Edition">MOONSHOT</span></h1>
-        <p>System Time: <span id="clock" aria-live="off">--:--:--</span></p>
+        <h1>ASR Trading Cockpit</h1>
+        <div id="conn-status" role="status" aria-live="polite">CONNECTING...</div>
     </header>
 
-    <main id="main-content" role="main">
-        <div class="grid">
-            <section class="card" aria-labelledby="status-heading">
-                <h2 id="status-heading">System Status</h2>
-                <div role="status" aria-live="polite">
-                    <p>Core Engine: <span class="status-ok">ONLINE</span></p>
-                    <p>Mode: <span id="mode">INITIALIZING...</span></p>
-                    <p>Reliability Score: <span id="reliability">--</span>%</p>
-                </div>
-            </section>
+    <main role="main" class="dashboard-grid">
 
-            <section class="card" aria-labelledby="signals-heading">
-                <h2 id="signals-heading">Active Command Signals</h2>
-                <ul id="signals-list" aria-live="polite">
-                    <li>Scanning market data...</li>
-                </ul>
-            </section>
-
-            <section class="card" aria-labelledby="ai-heading">
-                <h2 id="ai-heading">AI Brain Feed</h2>
-                <div id="ai-feed" style="font-size: 0.95em; color: #cbd5e1;" aria-live="polite">
-                    Waiting for analysis...
+        <!-- A. SYSTEM STATUS -->
+        <section aria-labelledby="h-status" class="panel">
+            <h2 id="h-status">System Status</h2>
+            <dl class="status-grid">
+                <div>
+                    <dt>Market:</dt>
+                    <dd id="market-state">--</dd>
                 </div>
-            </section>
-        </div>
+                <div>
+                    <dt>Feed:</dt>
+                    <dd id="feed-status">--</dd>
+                </div>
+                <div>
+                    <dt>Mode:</dt>
+                    <dd id="trading-mode">--</dd>
+                </div>
+                <div>
+                    <dt>Exec:</dt>
+                    <dd id="exec-mode">--</dd>
+                </div>
+                <div>
+                    <dt>Bot:</dt>
+                    <dd id="bot-status">--</dd>
+                </div>
+                <div>
+                    <dt>Algo:</dt>
+                    <dd id="algo-status">--</dd>
+                </div>
+            </dl>
+        </section>
+
+        <!-- A2. ALGO CONFIG (New) -->
+        <section aria-labelledby="h-config" class="panel">
+            <h2 id="h-config">Algo Configuration</h2>
+            <div class="row" style="gap: 10px; align-items: flex-end;">
+                <div style="flex-grow: 1;">
+                    <label for="cfg-watchlist">Watchlist (CSV):</label>
+                    <input type="text" id="cfg-watchlist" placeholder="TCS.NS, INFY.NS" aria-label="Watchlist Symbols"
+                        style="width: 100%;">
+                </div>
+                <button onclick="updateWatchlist()" class="btn secondary">Update</button>
+            </div>
+            <p id="cfg-display" style="font-size: 0.8em; color: #888; margin-top: 5px;">Current: --</p>
+        </section>
+
+        <!-- B. CURRENT ACTIVITY -->
+        <section id="activity-panel" aria-labelledby="h-activity" class="panel highlight-panel">
+            <h2 id="h-activity">Current Activity</h2>
+            <div role="region" aria-live="polite" aria-atomic="true">
+                <p class="big-status" id="act-state">Initializing...</p>
+                <dl class="activity-details">
+                    <div>
+                        <dt>Instrument:</dt>
+                        <dd id="act-instrument">--</dd>
+                    </div>
+                    <div>
+                        <dt>Strategy:</dt>
+                        <dd id="act-strategy">--</dd>
+                    </div>
+                    <div>
+                        <dt>Detail:</dt>
+                        <dd id="act-detail">--</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <!-- B2. PENDING APPROVALS (NEW) -->
+        <!-- "Assertive" means the screen reader will interrupt to read this immediately -->
+        <section id="approval-panel" aria-labelledby="h-approval" class="panel urgent-panel" style="display:none;"
+            aria-live="assertive">
+            <h2 id="h-approval">Pending Approvals</h2>
+            <div id="pending-list" role="group" aria-label="List of trades requiring approval">
+                <!-- Items injected by JS -->
+            </div>
+        </section>
+
+        <!-- C & D. CONTROLS -->
+        <section aria-labelledby="h-controls" class="panel">
+            <h2 id="h-controls">Controls</h2>
+
+            <div role="group" aria-labelledby="h-mode">
+                <h3 id="h-mode">Mode Selection</h3>
+                <div class="row" role="group" aria-label="Execution Environment">
+                    <button onclick="setMode('PAPER')" class="btn secondary"
+                        aria-label="Set Mode to Paper Trading">Switch to PAPER</button>
+                    <button onclick="setMode('LIVE')" class="btn danger" aria-label="Set Mode to Live Trading">Switch to
+                        LIVE</button>
+                </div>
+                <div style="margin-top: 5px;" role="group" aria-label="Automation Control">
+                    <button onclick="toggleAuto(true)" class="btn warning" aria-label="Enable Auto Trading">Enable
+                        AUTO</button>
+                    <button onclick="toggleAuto(false)" class="btn secondary" aria-label="Disable Auto Trading">Disable
+                        AUTO</button>
+                </div>
+            </div>
+
+            <div role="group" aria-labelledby="h-mon">
+                <h3 id="h-mon">Monitoring</h3>
+                <button onclick="toggleMonitor(true)" class="btn primary">Start Monitor</button>
+                <button onclick="toggleMonitor(false)" class="btn secondary">Stop Monitor</button>
+            </div>
+
+            <div role="group" aria-labelledby="h-man">
+                <h3 id="h-man">Smart Manual Trade</h3>
+                <div class="manual-form">
+                    <label for="man-symbol" class="sr-only">Symbol</label>
+                    <input type="text" id="man-symbol" placeholder="Symbol (e.g. TCS.NS)" aria-label="Trading Symbol">
+
+                    <label for="man-action" class="sr-only">Action</label>
+                    <select id="man-action" aria-label="Trade Action">
+                        <option value="BUY">BUY</option>
+                        <option value="SELL">SELL</option>
+                    </select>
+
+                    <label for="man-qty" class="sr-only">Quantity</label>
+                    <input type="number" id="man-qty" value="1" min="1" aria-label="Quantity" style="width: 80px;">
+
+                    <button onclick="checkTrade()" class="btn primary">Check Strategy</button>
+                    <div class="row">
+                        <button onclick="executeManual(false)" id="btn-exec-man" class="btn success" disabled>Execute
+                            LIVE</button>
+                        <button onclick="executeManual(true)" id="btn-exec-paper" class="btn secondary" disabled>Execute
+                            PAPER</button>
+                    </div>
+                </div>
+                <div id="man-result" class="status-text" role="status"></div>
+                <div id="man-suggestion" class="suggestion-text"></div>
+                <div id="man-risk" class="risk-text"></div>
+
+                <hr>
+                <button onclick="triggerKill()" class="btn danger">KILL SWITCH</button>
+            </div>
+        </section>
+
+        <!-- F. BALANCE -->
+        <section aria-labelledby="h-finance" class="panel">
+            <h2 id="h-finance">Balance & Risk</h2>
+            <dl class="finance-grid">
+                <div>
+                    <dt>Available:</dt>
+                    <dd id="bal-avail">--</dd>
+                </div>
+                <div>
+                    <dt>Used:</dt>
+                    <dd id="bal-used">--</dd>
+                </div>
+                <div>
+                    <dt>Risk Today:</dt>
+                    <dd id="bal-risk">--</dd>
+                </div>
+            </dl>
+            <button onclick="refreshBalanceAction()" aria-label="Refresh Balance Amount">Refresh Balance</button>
+
+            <!-- Mock Balance Input (Only valid in Paper Mode) -->
+            <div id="mock-bal-control" style="margin-top: 10px; border-top: 1px dashed #444; padding-top: 10px;">
+                <label for="mock-bal-input" class="sr-only">Set Mock Balance</label>
+                <input type="number" id="mock-bal-input" placeholder="Mock Capital" style="width: 100px;">
+                <button onclick="setMockBalance()" class="btn secondary" style="font-size: 0.8em;">Set Paper
+                    Capital</button>
+            </div>
+        </section>
+
+        <!-- G. EXPLANATION -->
+        <section aria-labelledby="h-decision" class="panel">
+            <h2 id="h-decision">Last Decision</h2>
+            <div aria-live="polite">
+                <h3 id="dec-result">--</h3>
+                <p><span id="dec-strategy">--</span> (<span id="dec-conf">--</span>)</p>
+                <p id="dec-reason">--</p>
+            </div>
+        </section>
+
+        <!-- H. LOGS -->
+        <section aria-labelledby="h-logs" class="panel wide">
+            <h2 id="h-logs">Messages</h2>
+            <ul id="log-list" class="log-list" role="log" aria-live="polite"></ul>
+        </section>
+
     </main>
-
-    <footer style="margin-top: 40px; font-size: 0.8em; color: #64748b;">
-        <p>Accessibility Compliance: ARIA 1.1, WCAG 2.1 AA Target.</p>
-    </footer>
-
-    <script>
-        // Clock
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
-
-        async function updatedata() {
-            try {
-                const resSpec = await fetch('/api/status').catch(e => null);
-                if (resSpec) {
-                    const data = await resSpec.json();
-                    document.getElementById('reliability').innerText = data.reliability;
-                    document.getElementById('mode').className = "status-ok";
-                }
-                document.getElementById('mode').innerText = "ENTERPRISE (SEMI-AUTO)";
-            } catch (e) {
-                console.log("Offline mode - dashboard running in standalone");
-            }
-        }
-        setInterval(updatedata, 3000); // Slower polling for less jitter
-        updatedata();
-    </script>
+    <script src="app.js"></script>
 </body>
 
 </html>

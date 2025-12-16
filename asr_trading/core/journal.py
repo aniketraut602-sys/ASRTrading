@@ -10,7 +10,7 @@ class TradeJournal:
     Logs every single trade outcome to a permanent CSV journal.
     This data feeds BrainStem (Learning) and Governance (Survivability).
     """
-    def __init__(self, journal_path="data/journal.csv"):
+    def __init__(self, journal_path="data/journal_v2.csv"):
         self.journal_path = journal_path
         self._ensure_journal_exists()
 
@@ -23,7 +23,8 @@ class TradeJournal:
                     writer.writerow([
                         "timestamp", "strategy_id", "symbol", "side", 
                         "quantity", "entry_price", "exit_price", 
-                        "pnl", "outcome", "confidence"
+                        "pnl", "outcome", "confidence",
+                        "RSI", "MACD", "ATR", "SMA_50", "Volatility"
                     ])
             except Exception as e:
                 logger.error(f"Journal: Failed to initialize journal at {self.journal_path}: {e}")
@@ -32,8 +33,17 @@ class TradeJournal:
         """
         Appends a completed trade record.
         Required keys: strategy_id, symbol, side, pnl, outcome (1=Win, 0=Loss)
+        Features are extracted from 'features' dict if present.
         """
         try:
+            feats = trade_data.get("features") or {}
+            # Normalize features (handle missing)
+            rsi = feats.get("RSI", 0.0)
+            macd = feats.get("MACD", 0.0)
+            atr = feats.get("ATR", 0.0)
+            sma = feats.get("SMA_50", 0.0)
+            vol = feats.get("Volatility", 0.0)
+
             with open(self.journal_path, 'a', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([
@@ -46,7 +56,8 @@ class TradeJournal:
                     trade_data.get("exit_price", 0.0),
                     trade_data.get("pnl", 0.0),
                     trade_data.get("outcome", 0), # 1 or 0
-                    trade_data.get("confidence", 0.0)
+                    trade_data.get("confidence", 0.0),
+                    rsi, macd, atr, sma, vol
                 ])
             logger.info(f"Journal: Logged trade for {trade_data.get('symbol')} (PnL: {trade_data.get('pnl')})")
         except Exception as e:

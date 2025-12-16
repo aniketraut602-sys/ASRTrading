@@ -86,7 +86,8 @@ class BrainStem:
 class SelfStudy:
     def __init__(self):
         self.brain = BrainStem()
-        self.journal_path = "data/journal.csv"
+        # 18.6 Continuous Learning: Point to V2 Journal with Feature Snapshots
+        self.journal_path = "data/journal_v2.csv"
 
     def nightly_review(self):
         """

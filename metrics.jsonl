@@ -62,3 +62,141 @@
 {"ts": 1765638495.5651178, "name": "event.feed_failover", "value": 1.0, "tags": {"failed": "TERTIARY", "symbol": "AAPL"}}
 {"ts": 1765638495.5655406, "name": "event.feed_outage_cache_serve", "value": 1.0, "tags": {"symbol": "AAPL"}}
 {"ts": 1765700029.1542604, "name": "event.risk_halt_daily_loss", "value": 1.0, "tags": {"loss": 500.0}}
+{"ts": 1765861614.509117, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765861614.61977, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765861614.7292154, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765861615.035994, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765861615.15242, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765862939.9155855, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765862940.0354562, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765862940.1454058, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765862940.4128504, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765862940.6135125, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765862998.7154117, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765862998.8414564, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765862998.9640546, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765862999.0695112, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765862999.2897313, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863058.8935065, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863059.013348, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863059.123141, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863059.242228, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863059.4022324, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863118.6990068, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863118.8148189, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863119.098201, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863119.2103415, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863119.3338473, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863178.697665, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863178.826174, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863178.963947, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863179.1035683, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863179.4103086, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863238.7024655, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863238.8257816, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863239.0096276, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863239.13589, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863239.2935667, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863298.7936046, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863298.9266257, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863299.0515924, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863299.199279, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863299.4232597, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863358.742591, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863358.856101, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863359.1156492, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863359.2371233, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863359.4295988, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863418.6999598, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863418.8427079, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863418.9706717, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863419.0901613, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863419.2898097, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863478.752717, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863478.9096978, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863479.0943823, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863479.2331955, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863479.5474074, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863538.8392265, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863538.9681983, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863539.1182373, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863539.3431427, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863539.4773812, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863598.7050612, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863598.8525157, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863599.045525, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863599.1858096, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863599.3320384, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863603.6776752, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863604.0741358, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863658.6973417, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863658.849328, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863658.9784372, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863659.097464, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863659.3448586, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863662.0903282, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863662.2890906, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863662.3994176, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863662.7402534, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863718.7047982, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863718.8250616, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863718.9488955, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863719.0699198, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863719.206089, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863722.0577602, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863722.1617503, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863722.283795, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863722.5357978, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863722.6524212, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863778.8530252, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863779.0691247, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863779.194012, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863779.31019, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863779.4298966, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863782.0677533, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863782.1777964, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863782.2878585, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863782.394151, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863782.5032086, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863839.092234, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863839.2415047, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863839.374645, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863839.5557215, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863839.800373, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863842.1055021, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863842.237678, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863842.6089494, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863848.5168052, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863898.6954718, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863898.8171694, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863898.9424732, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863899.0617502, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863899.2930677, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863902.2622118, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "RELIANCE.NS"}}
+{"ts": 1765863902.384432, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "HDFCBANK.NS"}}
+{"ts": 1765863902.5425048, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "TCS.NS"}}
+{"ts": 1765863902.663012, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "INFY.NS"}}
+{"ts": 1765863902.8609042, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765863906.9788291, "name": "event.feed_stale_rejected", "value": 1.0, "tags": {"provider": "YAHOO_FINANCE", "symbol": "AAPL"}}
+{"ts": 1765877855.0628173, "name": "event.audit_invariant_violation", "value": 1.0, "tags": {"error": "Plan Quantity must be positive", "context": {"id": "REJECT_1765877855"}}}
+{"ts": 1765885338.5828557, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885508.2066677, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885508.3256311, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885508.4428444, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885508.5577884, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885508.6616237, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885508.8784885, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885508.9909208, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885509.0966153, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885509.195276, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885509.3040116, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885509.4075916, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885509.5110455, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885509.6162798, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885509.7182994, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885509.963253, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885510.0642507, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885510.167438, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885510.2778547, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885510.3841736, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}
+{"ts": 1765885510.4893377, "name": "event.indicator_error", "value": 1.0, "tags": {"error": "'close'"}}

@@ -22,10 +22,27 @@ class PaperAdapter(BrokerAdapter):
         
         logger.info(f"PaperAdapter: [SIMULATION] {plan.side} {plan.quantity} {plan.symbol} @ {plan.entry_price}")
         
+        # Ledger Update
+        from asr_trading.core.cockpit import cockpit
+        cost = float(plan.entry_price) * int(plan.quantity)
+        
+        if plan.side == "BUY":
+            cockpit.balance_available -= cost
+            cockpit.margin_used += cost # Simplified margin tracking
+        elif plan.side == "SELL":
+            cockpit.balance_available += cost
+            cockpit.margin_used -= cost
+            if cockpit.margin_used < 0: cockpit.margin_used = 0
+            
         return {
             "order_id": order_id, 
             "status": "FILLED",
-            "avg_price": plan.entry_price,
-            "filled_qty": plan.quantity,
+            "avg_price": float(plan.entry_price),
+            "filled_qty": int(plan.quantity),
             "broker": "PAPER"
         }
+
+    async def get_balance(self) -> float:
+        # For paper, return the internal tracked balance
+        from asr_trading.core.cockpit import cockpit
+        return cockpit.balance_available

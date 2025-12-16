@@ -27,8 +27,8 @@ class ScalpingStrategy(Strategy):
         reason = ""
         
         rsi = last.get('RSI', 50)
-        macd = last.get('MACD_12_26_9', 0)
-        macd_signal = last.get('MACDs_12_26_9', 0)
+        macd = last.get('MACD', 0)
+        macd_signal = last.get('MACD_Signal', 0)
         
         # Buy Condition
         if rsi < 40 and macd > macd_signal:

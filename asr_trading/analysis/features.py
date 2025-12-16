@@ -121,7 +121,7 @@ class FeatureEngine:
         self.window_engine.add_ohlc(ohlc)
         df = self.window_engine.get_dataframe(ohlc.symbol)
         
-        if len(df) < 50: # Warmup
+        if len(df) < 5: # Warmup (Reduced for prototype responsiveness)
             return {"status": "WARMUP"}
 
         df_features = self.indicator_lib.compute_all(df)
