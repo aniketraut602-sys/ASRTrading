@@ -63,9 +63,12 @@ async def lifespan(app: FastAPI):
                 logger.info("Initializing Groww Adapter used...")
                 groww = GrowwAdapter()
                 # Connect is async
-                await groww.connect()
-                if groww.connected:
-                    execution_manager.set_brokers(primary=groww, secondary=None)
+                # Connect is async - Move to background to avoid blocking Server Startup
+                logger.info("Broker init moved to background task...")
+                asyncio.create_task(groww.connect())
+                
+                # Assume success for now to bind adapter, status will update later
+                execution_manager.set_brokers(primary=groww, secondary=None)
             elif cfg.KITE_API_KEY:
                 execution_manager.set_brokers(primary=KiteRealAdapter(), secondary=None)
         
