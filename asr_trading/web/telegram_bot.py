@@ -57,6 +57,10 @@ class TelegramAdminBot:
             await self.app.updater.start_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
             
         except Exception as e:
+            if "Conflict" in str(e) or "terminated by other getUpdates" in str(e):
+                 logger.warning(f"Telegram Bot Conflict: Another instance is running. Bot Mode = PASSIVE.")
+                 self.running = False
+                 return
             logger.error(f"Telegram Bot Crash: {e}", exc_info=True)
             self.running = False
 
