@@ -1,0 +1,31 @@
+runtime: custom
+env: flex
+
+# Automatic scaling configuration
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 1
+  cpu_utilization:
+    target_utilization: 0.6
+
+# Environment variables
+env_variables:
+  EXECUTION_MODE: "LIVE"
+  # Keys should be set in GCP Secret Manager, but placeholders here
+  GROWW_API_KEY: "MUST_BE_SET_IN_GCP" 
+  
+# Health check (Critical for survivability)
+readiness_check:
+  path: "/api/system/status"
+  check_interval_sec: 10
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+  app_start_timeout_sec: 300
+
+liveness_check:
+  path: "/api/system/status"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
