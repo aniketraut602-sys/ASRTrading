@@ -331,12 +331,12 @@ async def validate_trade(trade: TradeRequest):
         "status": "VALID",
         "symbol": plan.symbol,
         "action": plan.action,
-        "quantity": quantity, # Use requested quantity for display
-        "entry": plan.entry_price,
-        "target": plan.target_price,
+        "quantity": plan.quantity, # Use plan qty (might be reduced by risk)
+        "entry": plan.limit_price, # Use limit_price as entry anchor
+        "target": plan.take_profit,
         "stop_loss": plan.stop_loss,
         "risk_reward": plan.risk_reward_ratio,
-        "strategy": plan.strategy_name
+        "strategy": f"Plan {plan.plan_code}"
     }
 
 @app.post("/api/trade/paper")
