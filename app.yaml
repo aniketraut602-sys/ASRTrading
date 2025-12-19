@@ -6,6 +6,10 @@ resources:
   memory_gb: 2.0
   disk_size_gb: 10
 
+network:
+  forwarded_ports:
+    - 8080/tcp
+
 # Automatic scaling configuration
 automatic_scaling:
   min_num_instances: 1
