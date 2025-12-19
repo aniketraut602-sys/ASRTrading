@@ -594,10 +594,22 @@ async def shutdown_server():
     os.kill(os.getpid(), signal.SIGINT)
 
 # Serve Static
+# --- DEBUG / DIAGNOSTICS ---
+@app.get("/")
+async def root_check():
+    return {"status": "ONLINE", "version": cfg.VERSION, "message": "Root Route Reached"}
+
+@app.exception_handler(404)
+async def debug_404(request, exc):
+    logger.error(f"DEBUG 404: {request.method} {request.url}")
+    return {"status": "404", "detail": f"Route not found: {request.url.path}"}
+
+# Serve Static (Moved to last)
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if not os.path.exists(static_dir):
     os.makedirs(static_dir)
-app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+# Mount at /static to avoid conflicts with API
+app.mount("/static", StaticFiles(directory=static_dir, html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
