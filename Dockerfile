@@ -27,5 +27,6 @@ COPY . .
 # Expose port for Web Dashboard
 EXPOSE 8000
 
-# Default command (can be overridden in docker-compose)
-CMD ["python", "-m", "asr_trading.web.server"]
+# Default command (Production Gunicorn)
+ENV PORT=8080
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 asr_trading.web.server:app -k uvicorn.workers.UvicornWorker
