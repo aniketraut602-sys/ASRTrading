@@ -24,6 +24,27 @@ SYSTEM_STATE = {
     "trading_paused": False,
 }
 
+# --- Pydantic Models (V1.1 Hardening) ---
+from pydantic import BaseModel
+from typing import List, Optional
+
+class TradeRequest(BaseModel):
+    symbol: str
+    action: str = "BUY"
+    quantity: int = 1
+    confidence: float = 0.0
+    price: float = 0.0
+    confirm: bool = False # Required for LIVE trades
+
+class ModeRequest(BaseModel):
+    mode: str
+
+class WatchlistRequest(BaseModel):
+    symbols: List[str]
+
+class BalanceRequest(BaseModel):
+    amount: float
+
 # --- Lifespan for Startup/Shutdown ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -216,9 +237,9 @@ async def get_auto_rules():
     }
 
 @app.post("/api/mode/set")
-async def set_execution_mode(data: dict):
+async def set_execution_mode(data: ModeRequest):
     """5b. Set Execution Mode (PAPER/LIVE)"""
-    target = data.get("mode", "").upper()
+    target = data.mode.upper()
     if target not in ["PAPER", "LIVE"]:
         raise HTTPException(status_code=400, detail="Invalid mode. Use PAPER or LIVE.")
         
@@ -263,12 +284,11 @@ async def get_current_setup():
     }
 
 @app.post("/api/settings/watchlist")
-async def update_watchlist(data: dict):
+async def update_watchlist(data: WatchlistRequest):
     """8b. Update Watchlist"""
-    syms = data.get("symbols", [])
-    if isinstance(syms, str):
-        syms = [s.strip() for s in syms.split(",") if s.strip()]
-        
+    syms = data.symbols
+    # Pydantic handles list conversion, but if user sends string in list (edge case handled by client usually)
+    
     cfg.WATCHLIST = syms
     cockpit.monitored_setup = f"Monitoring {len(syms)} symbols"
     cockpit.add_message(f"Watchlist updated: {len(syms)} symbols", "INFO")
@@ -281,18 +301,18 @@ async def get_last_rejected():
 
 # E. MANUAL & PAPER TRADING
 @app.post("/api/trade/paper")
-async def execute_paper_trade(trade: dict = {}):
+async def execute_paper_trade(trade: TradeRequest):
     """
     10. Execute Paper Trade (Via Real Framework)
-    Input: Full Plan details (from Validate step) or reconstruction params.
+    Input: TradeRequest Model
     Unified Execution: Re-uses PlannerEngine to ensure identical plan.
     """
     
-    symbol = trade.get("symbol")
-    action = trade.get("action")
-    quantity = int(trade.get("quantity", 1))
-    confidence = float(trade.get("confidence", 1.0))
-    current_price = trade.get("price", 100.0)
+    symbol = trade.symbol
+    action = trade.action
+    quantity = trade.quantity
+    confidence = trade.confidence
+    current_price = trade.price
     
     from asr_trading.execution.execution_manager import execution_manager
     from asr_trading.strategy.planner import planner_engine
@@ -331,60 +351,18 @@ async def execute_paper_trade(trade: dict = {}):
         "message": f"Paper Order Processed: {result.get('status')}",
         "raw_response": str(result)
     }
-    action = trade.get("action")
-    quantity = int(trade.get("quantity", 1))
-    confidence = float(trade.get("confidence", 1.0))
-    
-    from asr_trading.execution.execution_manager import execution_manager
-    from asr_trading.strategy.planner import TradePlan
-    import uuid
-    
-    # Create Plan
-    plan = TradePlan(
-        plan_id=f"PAPER_{uuid.uuid4().hex[:8]}",
-        symbol=symbol,
-        side=action,
-        quantity=quantity,
-        limit_price=trade.get("price", 0.0), # Fixed to limit_price based on Planner def
-        entry_price=trade.get("price", 0.0), # Compat
-        stop_loss=0.0,
-        take_profit=0.0,
-        plan_code="MANUAL_PAPER",
-        confidence=confidence,
-        status="PENDING"
-    )
-    
-    import traceback
-    try:
-        # Execute through REAL framework but force Paper Adapter
-        # This validates Logic (Semi-Auto, Risk, etc) without Real Money
-        result = await execution_manager.execute_plan(plan, force_paper=True)
-    except Exception as e:
-        traceback.print_exc()
-        logger.error(f"Server Execute Error: {e}")
-        return {"status": "ERROR", "message": str(e)}
-    
-    status_msg = "SUCCESS" if "status" in result else "FAILED"
-    cockpit.add_message(f"Paper Order: {result.get('status', 'Submitted')}", status_msg)
-    
-    return {
-        "tradeId": plan.plan_id,
-        "status": result.get("status"), 
-        "message": f"Paper Order Processed: {result.get('status')}",
-        "raw_response": str(result)
-    }
 
 @app.post("/api/trade/validate")
-async def validate_manual_trade(trade: dict = {}):
+async def validate_manual_trade(trade: TradeRequest):
     """
     8. Smart Manual Trade Validation (Unified Execution Check)
-    Input: Basic params (Symbol, Action)
+    Input: TradeRequest
     Output: Full 'PROPOSED' TradePlan with A-J params.
     """
-    symbol = trade.get("symbol")
-    action = trade.get("action", "BUY")
-    confidence = float(trade.get("confidence", 0.0))
-    current_price = trade.get("price", 100.0)
+    symbol = trade.symbol
+    action = trade.action
+    confidence = trade.confidence
+    current_price = trade.price
     
     # 1. Generate Proposal via Real Analysis (Master Prompt Requirement)
     from asr_trading.strategy.planner import planner_engine
@@ -453,16 +431,16 @@ async def validate_manual_trade(trade: dict = {}):
     }
 
 @app.post("/api/trade/live")
-async def execute_live_trade(trade: dict = {}):
+async def execute_live_trade(trade: TradeRequest):
     """11. Execute Live Trade (Unified Flow)"""
-    if not trade.get("confirm"):
+    if not trade.confirm:
         raise HTTPException(status_code=400, detail="Confirmation required")
     
-    symbol = trade.get("symbol")
-    action = trade.get("action")
-    quantity = int(trade.get("quantity", 1))
-    confidence = float(trade.get("confidence", 1.0))
-    current_price = trade.get("price", 0.0)
+    symbol = trade.symbol
+    action = trade.action
+    quantity = trade.quantity
+    confidence = trade.confidence
+    current_price = trade.price
     
     from asr_trading.execution.execution_manager import execution_manager
     from asr_trading.strategy.planner import planner_engine
@@ -583,12 +561,12 @@ async def get_system_logs(limit: int = 50):
     return {"logs": formatted_logs}
 
 @app.post("/api/settings/balance")
-async def set_mock_balance(data: dict):
+async def set_mock_balance(data: BalanceRequest):
     """18. Set Mock Balance (Paper Mode Only)"""
     if not cfg.IS_PAPER:
         raise HTTPException(status_code=400, detail="Mock balance only allowed in PAPER mode")
     
-    amount = float(data.get("amount", 0))
+    amount = data.amount
     if amount <= 0:
         raise HTTPException(status_code=400, detail="Amount must be positive")
         
