@@ -23,14 +23,14 @@ env_variables:
 readiness_check:
   path: "/api/system/status"
   check_interval_sec: 30
-  timeout_sec: 20
+  timeout_sec: 60
   failure_threshold: 4
   success_threshold: 2
-  app_start_timeout_sec: 600
+  app_start_timeout_sec: 900 # 15 minutes max startup
 
 liveness_check:
   path: "/api/system/status"
   check_interval_sec: 60
-  timeout_sec: 20
-  failure_threshold: 4
+  timeout_sec: 60 # Allow 60s for ML inference to respond
+  failure_threshold: 10 # Be very lenient
   success_threshold: 2

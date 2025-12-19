@@ -28,5 +28,4 @@ COPY . .
 EXPOSE 8000
 
 # Default command (Production Gunicorn)
-ENV PORT=8080
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 asr_trading.web.server:app -k uvicorn.workers.UvicornWorker
+CMD gunicorn --bind 0.0.0.0:8080 --workers 1 --threads 8 --timeout 0 asr_trading.web.server:app -k uvicorn.workers.UvicornWorker
