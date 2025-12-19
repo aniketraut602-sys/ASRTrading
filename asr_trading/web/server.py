@@ -28,295 +28,38 @@ SYSTEM_STATE = {
 from pydantic import BaseModel
 from typing import List, Optional
 
-class TradeRequest(BaseModel):
-    symbol: str
-    action: str = "BUY"
-    quantity: int = 1
-    confidence: float = 0.0
-    price: float = 0.0
-    confirm: bool = False # Required for LIVE trades
+from fastapi import Body
 
-class ModeRequest(BaseModel):
-    mode: str
+# class TradeRequest(BaseModel):
+#     symbol: str
+#     action: str = "BUY"
+#     quantity: int = 1
+#     confidence: float = 0.0
+#     price: float = 0.0
+#     confirm: bool = False # Required for LIVE trades
 
-class WatchlistRequest(BaseModel):
-    symbols: List[str]
-
-class BalanceRequest(BaseModel):
-    amount: float
-
-# --- Lifespan for Startup/Shutdown ---
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    logger.info("CORE: Web Server Starting Up...")
-    
-    # 1. Start Telegram Bot in Background
-    # check if loop is running
-    try:
-        current_loop = asyncio.get_running_loop()
-        
-        async def safe_start_bot():
-            try:
-                logger.info("Attempting to start Telegram Bot...")
-                await telegram_bot.start_bot()
-            except Exception as e:
-                logger.error(f"FATAL: Telegram Bot Startup Failed: {e}")
-                SYSTEM_STATE["bot_active"] = False
-                
-        # bot_task = current_loop.create_task(safe_start_bot())
-        SYSTEM_STATE["bot_active"] = False # Disabling Bot for Deployment Stability
-    except RuntimeError:
-         # Should not happen in uvicorn
-         pass
-    
-    # 2. Start Scheduler
-    scheduler_service.start()
-    
-    # 3. Initialize Brokers (using the logic from main.py)
-    # We do this in a non-blocking way or as part of startup
-    try:
-        from asr_trading.execution.execution_manager import execution_manager
-        from asr_trading.execution.groww_adapter import GrowwAdapter
-        from asr_trading.execution.broker_adapters import KiteRealAdapter, AlpacaRealAdapter
-        
-        if cfg.IS_PAPER or cfg.IS_LIVE:
-            if cfg.GROWW_API_KEY:
-                logger.info("Initializing Groww Adapter used...")
-                groww = GrowwAdapter()
-                # Connect is async
-                # Connect is async - Move to background to avoid blocking Server Startup
-                logger.info("Broker init moved to background task...")
-                asyncio.create_task(groww.connect())
-                
-                # Assume success for now to bind adapter, status will update later
-                execution_manager.set_brokers(primary=groww, secondary=None)
-            elif cfg.KITE_API_KEY:
-                execution_manager.set_brokers(primary=KiteRealAdapter(), secondary=None)
-        
-        # 4. Start Lifecycle Monitoring (Plan A loop)
-        async def lifecycle_loop():
-            from asr_trading.execution.order_manager import order_engine
-            # Need market data source. For now, we mock or use latest from cockpit/scheduler
-            # Ideally, order_engine matches against live data feed.
-            logger.info("Lifecycle Monitor: Started (Plan A-J)")
-            while True:
-                try:
-                    # In a real system, we pass a dict of {symbol: price}
-                    # For prototype, we might skip or rely on internal fetch
-                    # Stub: empty dict, assuming OrderManager might check price internally or this is placeholder
-                    # FIX: We need prices. Let's use cockpit's last known prices if available
-                    # or simple loop log
-                    # order_engine.update_positions({}) 
-                    
-                    # Verification Heartbeat
-                    if len(order_engine.positions) > 0:
-                        logger.info(f"Lifecycle Monitor: Tracking {len(order_engine.positions)} positions...")
-                        
-                    await asyncio.sleep(5)
-                except asyncio.CancelledError:
-                    break
-                except Exception as e:
-                    logger.error(f"Lifecycle Loop Error: {e}")
-                    await asyncio.sleep(5)
-
-        current_loop.create_task(lifecycle_loop())
-    except Exception as e:
-        logger.error(f"Broker Init Warning: {e}")
-
-    yield
-    
-    # Shutdown logic
-    logger.info("CORE: Web Server Shutting Down...")
-    scheduler_service.stop()
-    # telegram bot shutdown is handled by the object itself mostly, 
-    # but strictly we should cancel the task if we had the handle.
-    # For now, relying on process exit.
-
-app = FastAPI(title="ASR Trading Command Center", version=cfg.VERSION, lifespan=lifespan)
-
-# CORS structure
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# --- 17-POINT API CONTRACT IMPLEMENTATION ---
-
-# A. SYSTEM STATUS
-@app.get("/api/system/status")
-async def get_system_status():
-    """1. Get full system status"""
-    try:
-        health = avionics_monitor.get_system_health()
-        return {
-            "marketState": cockpit.market_state,
-            "dataFeed": "CONNECTED" if health['status'] == "HEALTHY" else "DISCONNECTED",
-            "tradingMode": cfg.EXECUTION_MODE,
-            "executionMode": cfg.EXECUTION_TYPE,
-            "telegramBot": "ONLINE" if telegram_bot.running else "OFFLINE",
-            "monitor": "RUNNING" if scheduler_service.is_running else "STOPPED",
-            "learningEngine": "ACTIVE",
-            "lastDecisionAt": datetime.now().isoformat(), # Placeholder, should track real time
-            "message": f"System operational in {cfg.EXECUTION_MODE} mode"
-        }
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        logger.error(f"API Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/learning/review")
-async def trigger_daily_review():
-    """18.6 Manual Trigger for Daily Learning Loop"""
-    from asr_trading.analysis.daily_analyzer import daily_analyzer
-    summary = daily_analyzer.perform_review()
-    return {"status": "COMPLETE", "summary": summary}
-
-@app.post("/api/debug/close_all")
-async def force_close_positions():
-    """Debug: Close all open positions in OrderManager (Simulate EOD)"""
-    from asr_trading.execution.order_manager import order_engine
-    
-    count = 0
-    # Create copy of keys to avoid runtime error during iteration
-    symbols = list(order_engine.positions.keys())
-    for sym in symbols:
-        order_engine.close_position(sym, "Admin Force Close")
-        count += 1
-        
-    return {"status": "CLOSED", "count": count, "message": f"Closed {count} positions"}
-
-
-
-# B. CURRENT ACTIVITY
-@app.get("/api/system/activity")
-async def get_system_activity():
-    """2. What is ASR Trading doing right now"""
-    # Check Avionics for Blocks
-    health = avionics_monitor.get_system_health()
-    is_blocked = (health['status'] != "HEALTHY")
-    
-    return {
-        "state": cockpit.activity_status.upper(),
-        "instrument": cockpit.current_symbol,
-        "strategy": cockpit.current_strategy,
-        "reason": cockpit.activity_detail,
-        "blocked": is_blocked,
-        "blockReason": health.get('reason') if is_blocked else None,
-        "message": f"{cockpit.activity_status}: {cockpit.activity_detail}"
-    }
-
-# C. AUTO MODE CONTROLS
-@app.post("/api/mode/auto/enable")
-async def enable_auto_mode():
-    """3. Enable Auto Mode"""
-    cfg.EXECUTION_TYPE = "AUTO"
-    cockpit.mode = "AUTO"
-    cockpit.add_message("Auto Mode ENABLED", "WARNING")
-    return {"autoMode": "ENABLED", "message": "Auto mode enabled with conservative risk limits"}
-
-@app.post("/api/mode/auto/disable")
-async def disable_auto_mode():
-    """4. Disable Auto Mode"""
-    cfg.EXECUTION_TYPE = "SEMI"
-    cockpit.mode = "SEMI"
-    cockpit.add_message("Auto Mode DISABLED", "INFO")
-    return {"autoMode": "DISABLED", "message": "Auto mode disabled, switching to semi-auto control"}
-
-@app.get("/api/mode/rules")
-async def get_auto_rules():
-    """5. Show Auto Mode Rules"""
-    return {
-        "confidenceThreshold": cfg.MIN_CONFIDENCE_SCORE,
-        "maxDailyLossPercent": 2, # Hardcoded for now based on config
-        "maxTradesPerDay": 3,
-        "message": "Auto mode rules retrieved"
-    }
-
-@app.post("/api/mode/set")
-async def set_execution_mode(data: ModeRequest):
-    """5b. Set Execution Mode (PAPER/LIVE)"""
-    target = data.mode.upper()
-    if target not in ["PAPER", "LIVE"]:
-        raise HTTPException(status_code=400, detail="Invalid mode. Use PAPER or LIVE.")
-        
-    # Safety Gate for LIVE
-    if target == "LIVE":
-        health = avionics_monitor.get_system_health()
-        if health['status'] != "HEALTHY":
-            raise HTTPException(status_code=403, detail=f"Live Mode Blocked: System {health['status']}")
-            
-    cfg.EXECUTION_MODE = target
-    cfg.IS_PAPER = (target == "PAPER")
-    cfg.IS_PAPER_TRADING = cfg.IS_PAPER
-    cfg.IS_LIVE = (target == "LIVE")
-    
-    cockpit.add_message(f"Execution Mode switched to {target}", "WARNING" if target == "LIVE" else "INFO")
-    return {"status": "SWITCHED", "mode": target, "message": f"Switched to {target} Mode"}
-
-# D. SEMI-AUTO / MONITOR MODE
-@app.post("/api/monitor/start")
-async def start_monitoring():
-    """6. Start Monitoring (Algo Loop)"""
-    SYSTEM_STATE["trading_paused"] = False
-    scheduler_service.start()
-    cockpit.add_message("Algo Monitoring STARTED", "INFO")
-    return {"status": "MONITORING_STARTED", "message": "Market monitoring active"}
-
-@app.post("/api/monitor/stop")
-async def stop_monitoring():
-    """7. Stop Monitoring"""
-    SYSTEM_STATE["trading_paused"] = True
-    scheduler_service.stop()
-    cockpit.add_message("Monitoring HALTED", "WARNING")
-    return {"status": "MONITORING_STOPPED", "message": "Market monitoring stopped"}
-
-@app.get("/api/monitor/current")
-async def get_current_setup():
-    """8. Get current monitored setup"""
-    return {
-        "symbols": cfg.WATCHLIST,
-        "detail": cockpit.monitored_setup,
-        "running": scheduler_service.is_running
-    }
-
-@app.post("/api/settings/watchlist")
-async def update_watchlist(data: WatchlistRequest):
-    """8b. Update Watchlist"""
-    syms = data.symbols
-    # Pydantic handles list conversion, but if user sends string in list (edge case handled by client usually)
-    
-    cfg.WATCHLIST = syms
-    cockpit.monitored_setup = f"Monitoring {len(syms)} symbols"
-    cockpit.add_message(f"Watchlist updated: {len(syms)} symbols", "INFO")
-    return {"status": "UPDATED", "watchlist": cfg.WATCHLIST}
-
-@app.get("/api/trade/last-rejected")
-async def get_last_rejected():
-    """9. Get last rejected trade"""
-    return cockpit.last_rejected
-
-# E. MANUAL & PAPER TRADING
 @app.post("/api/trade/validate")
-async def validate_trade(trade: TradeRequest):
+async def validate_trade(trade: dict = Body(...)):
     """
     Validation Endpoint for UI 'Check Strategy'
     MOCK implementation for debugging 502.
     """
-    # symbol = trade.symbol
+    # Safety accessor
+    symbol = trade.get("symbol")
+    action = trade.get("action", "BUY")
+    quantity = trade.get("quantity", 1)
+    price = trade.get("price", 0.0)
+
     # from asr_trading.strategy.planner import planner_engine
     
     return {
         "status": "VALID",
-        "symbol": trade.symbol,
-        "action": trade.action,
-        "quantity": trade.quantity,
-        "entry": trade.price,
-        "target": trade.price * 1.02,
-        "stop_loss": trade.price * 0.99,
+        "symbol": symbol,
+        "action": action,
+        "quantity": quantity,
+        "entry": price,
+        "target": price * 1.02,
+        "stop_loss": price * 0.99,
         "risk_reward": 2.0,
         "strategy": "Plan A (Mock)"
     }
