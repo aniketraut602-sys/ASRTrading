@@ -22,6 +22,18 @@ class TradePlan:
     rejection_reason: Optional[str] = None # Why it was blocked
     features: Optional[Dict] = None # 18.6 Feature Snapshot for Learning
 
+    @property
+    def risk_reward_ratio(self) -> float:
+        if self.stop_loss == 0.0 or self.take_profit == 0.0 or self.limit_price == 0.0:
+            return 0.0
+        
+        risk = abs(self.limit_price - self.stop_loss)
+        reward = abs(self.take_profit - self.limit_price)
+        
+        if risk == 0: return 0.0
+        return round(reward / risk, 2)
+
+
 class PlannerEngine:
     """
     The State Machine.
