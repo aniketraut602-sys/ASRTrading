@@ -304,39 +304,21 @@ async def get_last_rejected():
 async def validate_trade(trade: TradeRequest):
     """
     Validation Endpoint for UI 'Check Strategy'
-    Generates the plan without executing it.
+    MOCK implementation for debugging 502.
     """
-    symbol = trade.symbol
-    action = trade.action
-    quantity = trade.quantity
-    confidence = trade.confidence
-    current_price = trade.price
+    # symbol = trade.symbol
+    # from asr_trading.strategy.planner import planner_engine
     
-    from asr_trading.strategy.planner import planner_engine
-    
-    # Generate proposal only
-    plan = planner_engine.generate_proposal(
-        strategy_id="MANUAL_VALIDATION", 
-        symbol=symbol,
-        action=action, 
-        confidence=confidence,
-        current_price=current_price
-    )
-    
-    if not plan:
-        return {"status": "ERROR", "message": "Plan Generation Failed (Risk/Strategy Rejection)"}
-        
-    # Return plan details for UI Modal
     return {
         "status": "VALID",
-        "symbol": plan.symbol,
-        "action": plan.action,
-        "quantity": plan.quantity, # Use plan qty (might be reduced by risk)
-        "entry": plan.limit_price, # Use limit_price as entry anchor
-        "target": plan.take_profit,
-        "stop_loss": plan.stop_loss,
-        "risk_reward": plan.risk_reward_ratio,
-        "strategy": f"Plan {plan.plan_code}"
+        "symbol": trade.symbol,
+        "action": trade.action,
+        "quantity": trade.quantity,
+        "entry": trade.price,
+        "target": trade.price * 1.02,
+        "stop_loss": trade.price * 0.99,
+        "risk_reward": 2.0,
+        "strategy": "Plan A (Mock)"
     }
 
 @app.post("/api/trade/paper")
