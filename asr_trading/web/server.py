@@ -300,6 +300,45 @@ async def get_last_rejected():
     return cockpit.last_rejected
 
 # E. MANUAL & PAPER TRADING
+@app.post("/api/trade/validate")
+async def validate_trade(trade: TradeRequest):
+    """
+    Validation Endpoint for UI 'Check Strategy'
+    Generates the plan without executing it.
+    """
+    symbol = trade.symbol
+    action = trade.action
+    quantity = trade.quantity
+    confidence = trade.confidence
+    current_price = trade.price
+    
+    from asr_trading.strategy.planner import planner_engine
+    
+    # Generate proposal only
+    plan = planner_engine.generate_proposal(
+        strategy_id="MANUAL_VALIDATION", 
+        symbol=symbol,
+        action=action, 
+        confidence=confidence,
+        current_price=current_price
+    )
+    
+    if not plan:
+        return {"status": "ERROR", "message": "Plan Generation Failed (Risk/Strategy Rejection)"}
+        
+    # Return plan details for UI Modal
+    return {
+        "status": "VALID",
+        "symbol": plan.symbol,
+        "action": plan.action,
+        "quantity": quantity, # Use requested quantity for display
+        "entry": plan.entry_price,
+        "target": plan.target_price,
+        "stop_loss": plan.stop_loss,
+        "risk_reward": plan.risk_reward_ratio,
+        "strategy": plan.strategy_name
+    }
+
 @app.post("/api/trade/paper")
 async def execute_paper_trade(trade: TradeRequest):
     """
