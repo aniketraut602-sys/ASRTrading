@@ -21,9 +21,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install system dependencies (Git is required for some python packages)
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-
 # Copy local code to the container image.
 COPY . ./
 
