@@ -22,7 +22,7 @@ env_variables:
 # Health check (Critical for survivability)
 readiness_check:
   path: "/api/system/status"
-  check_interval_sec: 30
+  check_interval_sec: 60
   timeout_sec: 60
   failure_threshold: 4
   success_threshold: 2
